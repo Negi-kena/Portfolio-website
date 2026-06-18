@@ -1,24 +1,19 @@
 // 1. DARK MODE TOGGLE
-// This matches the id="themeToggle" in the HTML and toggles between themes
 const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
 
 themeToggle.addEventListener("click", () => {
-    // Toggles the light-mode class on the body
     body.classList.toggle("light-mode");
-    
-    // Change the icon based on the current mode
     if (body.classList.contains("light-mode")) {
-        themeToggle.textContent = "🌙"; // Moon icon for light mode (to switch back)
+        themeToggle.textContent = "🌙";
     } else {
-        themeToggle.textContent = "☀️"; // Sun icon for dark mode
+        themeToggle.textContent = "☀️";
     }
 });
 
 // 2. SCROLL REVEAL ANIMATION
-// This makes the sections fade in as you scroll down the page
 const observerOptions = {
-    threshold: 0.15 // Section triggers when 15% is visible
+    threshold: 0.15
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -29,65 +24,75 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Target all elements with the .fade-section class
 document.querySelectorAll(".fade-section").forEach(section => {
     observer.observe(section);
 });
 
-// // 3. CONTACT FORM VALIDATION (Bonus Feature)
+// 3. CONTACT FORM VALIDATION & SUPABASE INTEGRATION
 const SUPABASE_URL = "https://cpzxrdasxrrspejskrac.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_d8ons9g7SHBmVqFnj0G38g_0qiWrhZg"; 
 
-// FIX: Changed variable name to "supabaseClient" on the left
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// 2. Target your form element
-// ... existing form setup logic ...
-const msgText = contactForm.querySelector('textarea[placeholder="Your Message"]').value;
-
-// Target our new response element
+const contactForm = document.getElementById("contact-form");
 const responseMsg = document.getElementById("form-response");
-// Reset it on every new submit attempt
-responseMsg.classList.add("d-none"); 
-responseMsg.className = "mt-3 text-center fw-bold d-none"; 
 
-btn.disabled = true;
-btn.textContent = "Sending Message...";
+if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Stop standard page reload/alert fallback
 
-try {
-    const { data, error } = await supabaseClient
-        .from('contact_messages') 
-        .insert([{ name: fullName, email: emailAddress, message: msgText }]);
-        
-    if (error) throw error;
-    
-    // SUCCESS UI UPDATE (Instead of alert)
-    responseMsg.textContent = "🚀 Message sent successfully! Check your inbox shortly.";
-    responseMsg.className = "mt-3 text-center fw-bold text-success animate-pop"; // Green text
-    responseMsg.classList.remove("d-none");
-    
-    contactForm.reset();
-    
-} catch (error) {
-    console.error("Form Submission Error:", error.message);
-    
-    // ERROR UI UPDATE (Instead of alert)
-    responseMsg.textContent = "❌ Oops! Something went wrong. Please try again.";
-    responseMsg.className = "mt-3 text-center fw-bold text-danger"; // Red text
-    responseMsg.classList.remove("d-none");
-} finally {
-    btn.disabled = false;
-    btn.textContent = originalText;
+        // Select elements and extract input fields properly by ID matching HTML
+        const fullName = document.getElementById("fullName").value;
+        const emailAddress = document.getElementById("emailAddress").value;
+        const msgText = document.getElementById("userMessage").value;
+        const btn = contactForm.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+
+        // Reset response message element parameters
+        responseMsg.classList.add("d-none"); 
+        responseMsg.className = "mt-3 text-center fw-bold d-none"; 
+
+        // UI Feedback: Disable button while pushing to DB
+        btn.disabled = true;
+        btn.textContent = "Sending Message...";
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('contact_messages') 
+                .insert([{ name: fullName, email: emailAddress, message: msgText }]);
+                
+            if (error) throw error;
+            
+            // SUCCESS INLINE UI UPDATE
+            responseMsg.textContent = "🚀 Message sent successfully! Check your inbox shortly.";
+            responseMsg.className = "mt-3 text-center fw-bold text-success"; 
+            responseMsg.classList.remove("d-none");
+            
+            contactForm.reset();
+            
+        } catch (error) {
+            console.error("Form Submission Error:", error.message);
+            
+            // ERROR INLINE UI UPDATE
+            responseMsg.textContent = "❌ Oops! Something went wrong. Please try again.";
+            responseMsg.className = "mt-3 text-center fw-bold text-danger"; 
+            responseMsg.classList.remove("d-none");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    });
 }
+
 // 4. SMOOTH SCROLLING FOR NAVIGATION LINKS
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
+        const targetElement = document.querySelector(this.getAttribute('href'));
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
     });
 });
-
-
-
