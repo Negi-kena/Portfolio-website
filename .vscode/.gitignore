@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Supabase local environment files
+.supabase/
+
+# Local environment variables secrets
+.env
+.env.local

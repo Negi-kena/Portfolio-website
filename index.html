@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negaso Kena | Full-Stack Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top glass-nav">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#"><span class="text-primary">PORTFOLIO</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item px-2"><button id="themeToggle" class="btn btn-sm btn-outline-secondary border-0" aria-label="Toggle dark mode">☀️</button></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary btn-sm ms-lg-3 text-white px-3" href="#contact">Contact Me</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="hero-section d-flex align-items-center">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content text-center text-white">
+            <h1 class="display-1 fw-bold animate-pop">I'm <span class="gradient-text">Negaso Kena</span></h1>
+            <p class="lead fs-2 mb-4">A Passionate Full-Stack Developer</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="#projects" class="btn btn-primary btn-lg rounded-pill px-4">View Projects</a>
+                <a href="#about" class="btn btn-outline-light btn-lg rounded-pill px-4">Learn More</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="about" class="py-5 bg-darker fade-section">
+            <div class="container py-5">
+                <div class="row align-items-center g-5">
+                    <div class="col-md-5 text-center">
+                        <div class="profile-card">
+                            <img src="assets/5951668927081418491.png" alt="Negaso Kena" class="img-fluid rounded-4 shadow-lg profile-img">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <h2 class="display-5 fw-bold mb-4">About Me</h2>
+                        <p class="fs-5 text-light-50">I am a developer-in-training at the Wabiskills full-stack bootcamp, dedicated to building high-performance web applications. I focus on clean architecture, intuitive user interfaces, and robust backend logic.</p>
+                        <p class="fs-5 text-light-50"><strong>Career Goals:</strong> To contribute to innovative tech teams by developing scalable digital systems and implementing reliable infrastructure pipelines.</p>
+                        <a href="assets/resume.pdf" download class="btn btn-outline-primary mt-3 px-4 py-2">Download CV</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-5 bg-dark fade-section">
+            <div class="container py-5">
+                <h2 class="text-center display-5 fw-bold mb-5">Technical & Professional Expertise</h2>
+                <div class="row g-5">
+                    <div class="col-md-6">
+                        <h4 class="mb-4 text-primary">Languages & Frontend</h4>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1"><span>HTML5 & CSS3</span><span>95%</span></div>
+                            <div class="progress" role="progressbar" aria-label="HTML5 and CSS3 proficiency" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1"><span>JavaScript (ES6+)</span><span>85%</span></div>
+                            <div class="progress" role="progressbar" aria-label="JavaScript proficiency" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1"><span>Bootstrap 5 & Tailwind</span><span>90%</span></div>
+                            <div class="progress" role="progressbar" aria-label="UI Frameworks proficiency" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-4 text-primary">Backend & Infrastructure</h4>
+                        <div class="row g-3">
+                            <div class="col-6"><div class="skill-card">Node.js</div></div>
+                            <div class="col-6"><div class="skill-card">Docker Containers</div></div>
+                            <div class="col-6"><div class="skill-card">Linux / Ubuntu</div></div>
+                            <div class="col-6"><div class="skill-card">n8n Automation</div></div>
+                            <div class="col-6"><div class="skill-card">HubSpot CRM Architecture</div></div>
+                            <div class="col-6"><div class="skill-card">REST APIs & Webhooks</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soft Skills Fixed Row -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <h4 class="mb-4 text-primary">Professional & Soft Skills</h4>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-secondary p-2 fs-6">Technical Support & Peer Mentorship</span>
+                            <span class="badge bg-secondary p-2 fs-6">Cross-Functional Communication</span>
+                            <span class="badge bg-secondary p-2 fs-6">Solution-Oriented Problem Solving</span>
+                            <span class="badge bg-secondary p-2 fs-6">Empathetic Collaboration</span>
+                            <span class="badge bg-secondary p-2 fs-6">Adaptability</span>
+                            <span class="badge bg-secondary p-2 fs-6">Agile Mindset</span>
+                            <span class="badge bg-secondary p-2 fs-6">Community-Driven Digital Advocacy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-5 bg-darker fade-section">
+            <div class="container py-5">
+                <h2 class="text-center display-5 fw-bold mb-5">Featured Projects</h2>
+                <div class="row g-4">
+                    
+                    <!-- Project 1: DevPromptizer -->
+                    <div class="col-md-6">
+                        <div class="project-card glass shadow-lg h-100 d-flex flex-column">
+                            <div class="p-3 text-center bg-dark rounded-5 m-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 3rem;" role="img" aria-label="Gear icon">⚙️</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="fw-bold">DevPromptizer</h5>
+                                    <p class="small text-light-50">An application engineered to help software developers generate highly structured, context-aware prompts tailored for complex development workflows and AI-assisted programming tasks.</p>
+                                    <p class="small text-warning"><strong>Roadmap:</strong> Active plans to scale and transition this system into a full feature-set web application with cloud prompt-templates and team capabilities.</p>
+                                    <p class="text-primary small fw-bold mb-2">Tech: Prompt Engineering, AI Context Modeling</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-dark">Developer Tooling</span>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <a href="https://partyrock.aws/u/Negaso/TTYUmHWld/DevPromptizer" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary px-3">Live App</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: Ethio Scam Checker -->
+                    <div class="col-md-6">
+                        <div class="project-card glass shadow-lg h-100 d-flex flex-column">
+                            <div class="p-3 text-center bg-dark rounded-5 m-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 3rem;" role="img" aria-label="Shield icon">🛡️</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="fw-bold">Ethio Scam Checker</h5>
+                                    <p class="small text-light-50">A community-driven application engineered to track, list, and flag local digital scams, malicious links, and fraudulent channels in the Ethiopian ecosystem.</p>
+                                    <p class="small text-light-50">Built to provide clear safety metrics, verifying identity patterns to safeguard users and boost community digital literacy.</p>
+                                    <p class="text-primary small fw-bold mb-2">Tech: AWS PartyRock, LLM Architecture, Web Security</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-dark">Web Safety Platform</span>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <a href="https://partyrock.aws/u/Negaso/24iVTOzpB/Ethio-Scam-Checker" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary px-3">Live App</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: Student Management System -->
+                    <div class="col-md-6">
+                        <div class="project-card glass shadow-lg h-100 d-flex flex-column border border-warning">
+                            <img src="assets/student-management.png" class="card-img-top p-3 rounded-5" alt="Student Management System Dashboard Preview" style="height: 140px; object-fit: contain;">
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="fw-bold m-0">School Management System</h5>
+                                        <span class="badge bg-warning text-dark font-monospace fw-bold">IN PROGRESS</span>
+                                    </div>
+                                    <p class="small text-light-50">A local dashboard and core school management application architecture built to streamline complex academic data tracking, grading logic, and user permissions models.</p>
+                                    <p class="text-primary small fw-bold mb-2">Tech: React, Node.js, Relational Databases</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-dark">Full-Stack System</span>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <button class="btn btn-sm btn-outline-warning px-3" disabled>In Production</button>
+                                        <a href="https://github.com/Negi-kena" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light px-3">GitHub</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: TaskFlow -->
+                    <div class="col-md-6">
+                        <div class="project-card glass shadow-lg h-100 d-flex flex-column">
+                            <div class="p-3 text-center bg-dark rounded-5 m-3" style="height: 140px; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 3rem;" role="img" aria-label="Clipboard icon">📋</span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="fw-bold">TaskFlow SPA</h5>
+                                    <p class="small text-light-50">A comprehensive task optimization environment structured natively with robust, decoupled JavaScript modules. Features custom reactive state handling, dual layouts, security sanitization pipelines, and a global command palette interface.</p>
+                                    <p class="text-primary small fw-bold mb-2">Tech: Vanilla JS (ES6+), CSS Grid/Flexbox, LocalStorage</p>
+                                </div>
+                                <div>
+                                    <span class="badge bg-dark">State-Driven Architecture</span>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <a href="https://github.com/Negi-kena/TaskFlow" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-light px-3 w-100">View Code</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-5 bg-dark fade-section">
+            <div class="container py-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="contact-box glass p-5 border">
+                            <h2 class="text-center fw-bold mb-4">Get In Touch</h2>
+                            <form id="contact-form">
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label text-light-50">Full Name:</label>
+                                    <input type="text" id="fullName" class="form-control bg-dark border-secondary text-white" placeholder="Full Name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailAddress" class="form-label text-light-50">Email Address:</label>
+                                    <input type="email" id="emailAddress" class="form-control bg-dark border-secondary text-white" placeholder="Email Address" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="userMessage" class="form-label text-light-50">Your Message:</label>
+                                    <textarea id="userMessage" class="form-control bg-dark border-secondary text-white" rows="4" placeholder="Your Message" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">Send Message</button>
+                                <div id="form-response" class="mt-3 text-center fw-bold d-none"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-4 bg-darker border-top border-secondary">
+        <p class="mb-0 text-light-50">© 2026 Negaso Kena | Full-Stack Student @ Wabiskills</p>
+    </footer>
+
+    <!-- Swapped raw CSS JS link for the full Bootstrap Bundle with JavaScript interactions -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>
