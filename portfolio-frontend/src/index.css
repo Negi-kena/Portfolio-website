@@ -1,0 +1,355 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+@theme {
+  /* --- Structural colors --- */
+  --color-navy-950: #0a0e27;
+  --color-navy-900: #0e1330;
+  --color-navy-800: #131a3a;
+  --color-navy-700: #1c2450;
+  --color-navy-600: #2a3466;
+
+  /* --- Signal colors --- */
+  --color-magenta-400: #c266f5;
+  --color-magenta-500: #a63fea;
+  --color-magenta-600: #8b2bd0;
+
+  --color-sea-400: #3fbfae;
+  --color-sea-500: #2dd4bf;
+  --color-sea-600: #1fa896;
+
+  /* --- Typography --- */
+  --color-paper: #f4f2f8;
+  --color-paper-dim: #b8b6c9;
+  --color-paper-faint: #7c7a94;
+
+  /* --- Fonts --- */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* =========================================================
+   LIGHT THEME
+   ========================================================= */
+
+html.theme-light {
+  --color-navy-950: #f3f6fa;
+  --color-navy-900: #e9eef5;
+  --color-navy-800: #dfe6ef;
+  --color-navy-700: #cdd7e4;
+  --color-navy-600: #b7c4d4;
+
+  --color-magenta-400: #963bd3;
+  --color-magenta-500: #8428c3;
+  --color-magenta-600: #7020a8;
+
+  --color-sea-400: #158f81;
+  --color-sea-500: #128373;
+  --color-sea-600: #0d6d60;
+
+  --color-paper: #10172b;
+  --color-paper-dim: #4d5870;
+  --color-paper-faint: #758096;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+@layer base {
+  * {
+    border-color: var(--color-navy-600);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-navy-950);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-navy-950);
+    color: var(--color-paper);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-magenta-500);
+    color: var(--color-navy-950);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sea-400);
+    outline-offset: 2px;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* =========================================================
+   THEME TRANSITION
+   ========================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-dark *,
+  html.theme-light * {
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease,
+      fill 250ms ease,
+      stroke 250ms ease;
+  }
+}
+
+/* =========================================================
+   BLUEPRINT GRID
+   ========================================================= */
+
+@layer utilities {
+  .blueprint-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(
+          in srgb,
+          var(--color-paper-dim) 7%,
+          transparent
+        ) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(
+          in srgb,
+          var(--color-paper-dim) 7%,
+          transparent
+        ) 1px,
+        transparent 1px
+      );
+
+    background-size: 32px 32px;
+  }
+
+  .text-gradient-signal {
+    background: linear-gradient(
+      90deg,
+      var(--color-magenta-400),
+      var(--color-sea-400)
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* =========================================================
+   BRANDED THEME BULB
+   ========================================================= */
+
+.theme-bulb {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+
+  border: 1px solid var(--color-navy-600);
+  border-radius: 9px;
+
+  background: var(--color-navy-900);
+  color: var(--color-paper-dim);
+
+  cursor: pointer;
+
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease,
+    transform 150ms ease;
+}
+
+.theme-bulb:hover {
+  border-color: var(--color-sea-400);
+  color: var(--color-sea-400);
+  transform: translateY(-1px);
+}
+
+.theme-bulb:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.theme-bulb svg {
+  overflow: visible;
+}
+
+/* --- Bulb structure --- */
+
+.bulb-rays,
+.bulb-glass,
+.bulb-base,
+.bulb-filament {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bulb-glass {
+  stroke-width: 1.8;
+}
+
+.bulb-base {
+  stroke-width: 1.8;
+}
+
+.bulb-filament {
+  stroke-width: 1.4;
+}
+
+/* --- Dark mode: dim bulb --- */
+
+.theme-bulb-dim {
+  color: var(--color-paper-faint);
+}
+
+.theme-bulb-dim .bulb-rays {
+  opacity: 0;
+}
+
+.theme-bulb-dim .bulb-glass {
+  opacity: 0.65;
+}
+
+.theme-bulb-dim .bulb-filament {
+  opacity: 0.35;
+}
+
+/* --- Light mode: illuminated bulb --- */
+
+.theme-bulb-lit {
+  color: var(--color-magenta-500);
+
+  border-color: color-mix(
+    in srgb,
+    var(--color-magenta-500) 45%,
+    var(--color-navy-600)
+  );
+
+  box-shadow:
+    0 0 0 1px
+      color-mix(
+        in srgb,
+        var(--color-magenta-500) 12%,
+        transparent
+      ),
+    0 0 18px
+      color-mix(
+        in srgb,
+        var(--color-magenta-500) 18%,
+        transparent
+      );
+}
+
+.theme-bulb-lit .bulb-rays {
+  opacity: 1;
+  color: var(--color-sea-400);
+}
+
+.theme-bulb-lit .bulb-glass {
+  fill: color-mix(
+    in srgb,
+    var(--color-magenta-400) 14%,
+    transparent
+  );
+}
+
+.theme-bulb-lit .bulb-filament {
+  color: var(--color-sea-400);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .theme-bulb-lit .bulb-glass {
+    animation: bulb-breathe 2.4s ease-in-out infinite;
+  }
+
+  .theme-bulb-lit .bulb-rays {
+    animation: bulb-rays 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes bulb-breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bulb-rays {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   SIGNAL ANIMATION
+   ========================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-signal {
+    animation: signal-draw 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes signal-draw {
+  0% {
+    stroke-dashoffset: 1200;
+  }
+
+  60% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -1200;
+  }
+}

@@ -1,0 +1,130 @@
+import { Request, Response } from "express";
+import { z } from "zod";
+import { prisma } from "../config/prisma";
+import { ApiError } from "../utils/ApiError";
+import { asyncHandler } from "../utils/asyncHandler";
+import { slugify } from "../utils/slugify";
+
+const postSchema = z.object({
+  title: z.string().min(1),
+  excerpt: z.string().min(1),
+  content: z.string().min(1),
+  coverImage: z.string().optional(),
+  published: z.boolean().optional(),
+  tags: z.array(z.string().min(1)).optional(),
+});
+
+const postInclude = { tags: { include: { tag: true } } } as const;
+
+type PostWithJoinTags = Awaited<ReturnType<typeof prisma.blogPost.findMany<{ include: typeof postInclude }>>>[number];
+
+const serializePost = (post: PostWithJoinTags) => ({
+  ...post,
+  tags: post.tags.map(({ tag }) => tag),
+});
+
+const tagWrites = (names: string[]) =>
+  [...new Set(names.map((name) => name.trim()).filter(Boolean))].map((name) => ({
+    tag: {
+      connectOrCreate: {
+        where: { name },
+        create: { name, slug: slugify(name) },
+      },
+    },
+  }));
+
+// GET /api/blog (public — published only)
+export const listPublishedPosts = asyncHandler(async (_req: Request, res: Response) => {
+  const posts = await prisma.blogPost.findMany({
+    where: { published: true },
+    include: postInclude,
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+  });
+  res.json({ success: true, data: posts.map(serializePost) });
+});
+
+// GET /api/blog/:slug (public)
+export const getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
+  const post = await prisma.blogPost.findFirst({
+    where: { slug: req.params.slug, published: true },
+    include: postInclude,
+  });
+  if (!post) throw ApiError.notFound("Post not found");
+  res.json({ success: true, data: serializePost(post) });
+});
+
+// GET /api/admin/blog (admin — all posts)
+export const listAllPosts = asyncHandler(async (_req: Request, res: Response) => {
+  const posts = await prisma.blogPost.findMany({
+    include: postInclude,
+    orderBy: { createdAt: "desc" },
+  });
+  res.json({ success: true, data: posts.map(serializePost) });
+});
+
+// POST /api/admin/blog (admin)
+export const createPost = asyncHandler(async (req: Request, res: Response) => {
+  const data = postSchema.parse(req.body);
+  const slug = slugify(data.title);
+  const published = data.published ?? false;
+
+  const post = await prisma.blogPost.create({
+    data: {
+      title: data.title,
+      slug,
+      excerpt: data.excerpt,
+      content: data.content,
+      coverImage: data.coverImage,
+      published,
+      publishedAt: published ? new Date() : null,
+      tags: data.tags ? { create: tagWrites(data.tags) } : undefined,
+    },
+    include: postInclude,
+  });
+
+  res.status(201).json({ success: true, data: serializePost(post) });
+});
+
+// PUT /api/admin/blog/:id (admin)
+export const updatePost = asyncHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid post id");
+
+  const data = postSchema.partial().parse(req.body);
+  const existing = await prisma.blogPost.findUnique({ where: { id } });
+  if (!existing) throw ApiError.notFound("Post not found");
+
+  const published = data.published;
+  const shouldSetPublishedAt = published === true && !existing.publishedAt;
+  const shouldClearPublishedAt = published === false;
+
+  const post = await prisma.blogPost.update({
+    where: { id },
+    data: {
+      title: data.title,
+      excerpt: data.excerpt,
+      content: data.content,
+      coverImage: data.coverImage,
+      published,
+      publishedAt: shouldSetPublishedAt ? new Date() : shouldClearPublishedAt ? null : undefined,
+      slug: data.title ? slugify(data.title) : undefined,
+      tags: data.tags
+        ? {
+            deleteMany: {},
+            create: tagWrites(data.tags),
+          }
+        : undefined,
+    },
+    include: postInclude,
+  });
+
+  res.json({ success: true, data: serializePost(post) });
+});
+
+// DELETE /api/admin/blog/:id (admin)
+export const deletePost = asyncHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid post id");
+  await prisma.blogPost.delete({ where: { id } });
+  res.json({ success: true, message: "Post deleted" });
+});
