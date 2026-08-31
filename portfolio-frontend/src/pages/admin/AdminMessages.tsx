@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Mail, MailOpen, Trash2 } from "lucide-react";
+import { Mail, MailOpen, Trash2, Send, CheckCheck } from "lucide-react";
 import { useFetch } from "../../hooks/useFetch";
-import { getMessages, markMessageRead, deleteMessage } from "../../api/endpoints";
+import { getMessages, markMessageRead, deleteMessage, replyToMessage } from "../../api/endpoints";
 import { Loading } from "../../components/ui/Loading";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { Button } from "../../components/ui/Button";
+import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
 import type { Message } from "../../types";
 
 const formatDate = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
@@ -12,25 +13,47 @@ const formatDate = (iso: string) => new Date(iso).toLocaleString(undefined, { da
 export function AdminMessages() {
   const { data: messages, loading, refetch } = useFetch(getMessages, []);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [replyDrafts, setReplyDrafts] = useState<Record<number, string>>({});
+  const [sendingReplyId, setSendingReplyId] = useState<number | null>(null);
+  const [replyError, setReplyError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const handleOpen = async (m: Message) => {
     setExpanded(expanded === m.id ? null : m.id);
+    setReplyError(null);
     if (!m.read) {
       await markMessageRead(m.id);
       refetch();
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Delete this message?")) return;
-    await deleteMessage(id);
+  const handleSendReply = async (id: number) => {
+    const body = (replyDrafts[id] || "").trim();
+    if (!body) return;
+    setSendingReplyId(id);
+    setReplyError(null);
+    try {
+      await replyToMessage(id, body);
+      setReplyDrafts((d) => ({ ...d, [id]: "" }));
+      refetch();
+    } catch (err: any) {
+      setReplyError(err?.response?.data?.message || "Failed to send reply.");
+    } finally {
+      setSendingReplyId(null);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (pendingDeleteId === null) return;
+    await deleteMessage(pendingDeleteId);
+    setPendingDeleteId(null);
     refetch();
   };
 
   return (
     <div>
       <h1 className="font-display text-2xl font-bold text-paper">Messages</h1>
-      <p className="mt-1 mb-8 text-paper-dim">Submissions from your contact form.</p>
+      <p className="mt-1 mb-8 text-paper-dim">Submissions from your contact form. Replies are sent directly from here.</p>
 
       {loading ? (
         <Loading />
@@ -50,6 +73,11 @@ export function AdminMessages() {
                   <div className="min-w-0">
                     <p className={`truncate font-medium ${m.read ? "text-paper-dim" : "text-paper"}`}>
                       {m.name} <span className="font-mono text-xs text-paper-faint">· {m.email}</span>
+                      {m.replied && (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-sea-400/40 px-1.5 py-0.5 font-mono text-[10px] text-sea-400">
+                          <CheckCheck size={10} /> replied
+                        </span>
+                      )}
                     </p>
                     <p className="truncate text-sm text-paper-faint">{m.subject || m.message}</p>
                   </div>
@@ -60,13 +88,30 @@ export function AdminMessages() {
               {expanded === m.id && (
                 <div className="mt-3 rounded-md bg-navy-800/60 p-4">
                   <p className="whitespace-pre-wrap text-sm text-paper-dim">{m.message}</p>
-                  <div className="mt-3 flex gap-2">
-                    <a href={`mailto:${m.email}`}>
-                      <Button variant="ghost">Reply by email</Button>
-                    </a>
-                    <Button variant="danger" onClick={() => handleDelete(m.id)}>
-                      <Trash2 size={14} /> Delete
-                    </Button>
+
+                  <div className="mt-4 border-t border-navy-700 pt-4">
+                    <label className="mb-1 block font-mono text-xs text-paper-faint">
+                      {m.replied ? "send another reply" : "reply"}
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={replyDrafts[m.id] || ""}
+                      onChange={(e) => setReplyDrafts((d) => ({ ...d, [m.id]: e.target.value }))}
+                      placeholder={`Write your reply to ${m.name}…`}
+                      className="w-full resize-y rounded-md border border-navy-600 bg-navy-800/60 px-3 py-2.5 text-sm text-paper focus:border-sea-400 focus:outline-none"
+                    />
+                    {replyError && <p className="mt-2 text-xs text-red-400">{replyError}</p>}
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        onClick={() => handleSendReply(m.id)}
+                        disabled={sendingReplyId === m.id || !(replyDrafts[m.id] || "").trim()}
+                      >
+                        <Send size={14} /> {sendingReplyId === m.id ? "Sending…" : "Send reply"}
+                      </Button>
+                      <Button variant="danger" onClick={() => setPendingDeleteId(m.id)}>
+                        <Trash2 size={14} /> Delete
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -74,6 +119,15 @@ export function AdminMessages() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Delete this message?"
+        description="This can't be undone."
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 }

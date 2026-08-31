@@ -41,6 +41,8 @@ export interface Message {
   subject?: string | null;
   message: string;
   read: boolean;
+  replied: boolean;
+  repliedAt?: string | null;
   createdAt: string;
 }
 

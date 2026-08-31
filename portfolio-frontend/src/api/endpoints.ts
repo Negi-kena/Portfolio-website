@@ -68,6 +68,8 @@ export const getMessages = () =>
   apiClient.get<ApiResponse<Message[]>>("/admin/messages").then((r) => r.data.data);
 export const markMessageRead = (id: number) =>
   apiClient.patch<ApiResponse<Message>>(`/admin/messages/${id}/read`).then((r) => r.data.data);
+export const replyToMessage = (id: number, body: string) =>
+  apiClient.post<ApiResponse<Message>>(`/admin/messages/${id}/reply`, { body }).then((r) => r.data.data);
 export const deleteMessage = (id: number) => apiClient.delete(`/admin/messages/${id}`);
 
 // --- Settings ---

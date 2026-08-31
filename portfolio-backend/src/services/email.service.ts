@@ -39,3 +39,33 @@ export const sendContactNotification = async (input: ContactEmailInput): Promise
     html: `<p><strong>From:</strong> ${name} (${email})</p><p>${message.replace(/\n/g, "<br/>")}</p>`,
   });
 };
+
+interface ReplyEmailInput {
+  toName: string;
+  toEmail: string;
+  originalSubject?: string | null;
+  replyBody: string;
+}
+
+// Sends the admin's reply directly to the lead's inbox, from your own
+// configured address — no mailto:/external mail client involved.
+export const sendReplyEmail = async (input: ReplyEmailInput): Promise<void> => {
+  const { toName, toEmail, originalSubject, replyBody } = input;
+
+  if (!transporter) {
+    throw new Error(
+      "SMTP is not configured on the server (SMTP_HOST/SMTP_USER/SMTP_PASS), so in-app replies can't be sent yet."
+    );
+  }
+
+  const subjectLine = originalSubject ? `Re: ${originalSubject}` : "Re: your message";
+
+  await transporter.sendMail({
+    from: `"${env.CONTACT_RECEIVER_EMAIL ? "Negaso Kena" : env.SMTP_USER}" <${env.SMTP_USER}>`,
+    to: `"${toName}" <${toEmail}>`,
+    replyTo: env.CONTACT_RECEIVER_EMAIL || env.SMTP_USER,
+    subject: subjectLine,
+    text: replyBody,
+    html: `<p>${replyBody.replace(/\n/g, "<br/>")}</p>`,
+  });
+};
