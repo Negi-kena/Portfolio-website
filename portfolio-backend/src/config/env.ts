@@ -8,11 +8,18 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default("http://localhost:5173"),
   JWT_SECRET: z.string().min(10, "JWT_SECRET must be set to a long random string"),
   JWT_EXPIRES_IN: z.string().default("7d"),
+
+  // Resend
+  RESEND_API_KEY: z.string().optional().default(""),
+  EMAIL_FROM: z.string().optional().default(""), // e.g. "Negaso Kena <noreply@caloupelio.resend.app>"
+  CONTACT_RECEIVER_EMAIL: z.string().optional().default(""),
+
+  // Keep old SMTP vars optional so existing .env files don't crash
   SMTP_HOST: z.string().optional().default(""),
   SMTP_PORT: z.string().optional().default("587"),
   SMTP_USER: z.string().optional().default(""),
   SMTP_PASS: z.string().optional().default(""),
-  CONTACT_RECEIVER_EMAIL: z.string().optional().default(""),
+
   MAX_UPLOAD_MB: z.string().default("5"),
 });
 

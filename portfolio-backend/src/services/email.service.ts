@@ -1,5 +1,7 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../config/env";
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 interface ContactEmailInput {
   name: string;
@@ -8,36 +10,35 @@ interface ContactEmailInput {
   message: string;
 }
 
-const smtpConfigured = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS);
-
-const transporter = smtpConfigured
-  ? nodemailer.createTransport({
-      host: env.SMTP_HOST,
-      port: Number(env.SMTP_PORT),
-      secure: Number(env.SMTP_PORT) === 465,
-      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-    })
-  : null;
-
 export const sendContactNotification = async (input: ContactEmailInput): Promise<void> => {
   const { name, email, subject, message } = input;
-  const to = env.CONTACT_RECEIVER_EMAIL || env.SMTP_USER;
+  const to = env.CONTACT_RECEIVER_EMAIL;
 
-  if (!transporter || !to) {
-    // Graceful fallback so the contact form still "works" without SMTP configured
-    console.log("📧 [email fallback — SMTP not configured] New contact message:");
+  if (!env.RESEND_API_KEY || !to || !env.EMAIL_FROM) {
+    console.log("📧 [email fallback — Resend not fully configured] New contact message:");
     console.log({ name, email, subject, message });
     return;
   }
 
-  await transporter.sendMail({
-    from: `"Portfolio Contact Form" <${env.SMTP_USER}>`,
+  const { error } = await resend.emails.send({
+    from: env.EMAIL_FROM,
     to,
-    replyTo: email,
+    replyTo: email, // when you click Reply in Gmail it goes to the visitor
     subject: `New portfolio message: ${subject || "No subject"}`,
-    text: `From: ${name} <${email}>\n\n${message}`,
-    html: `<p><strong>From:</strong> ${name} (${email})</p><p>${message.replace(/\n/g, "<br/>")}</p>`,
+    html: `
+      <div style="font-family: sans-serif; line-height: 1.6;">
+        <p><strong>From:</strong> ${name} (${email})</p>
+        <p><strong>Subject:</strong> ${subject || "No subject"}</p>
+        <hr />
+        <p>${message.replace(/\n/g, "<br/>")}</p>
+      </div>
+    `,
   });
+
+  if (error) {
+    console.error("Contact notification failed:", error);
+    throw new Error(error.message || "Failed to send contact notification");
+  }
 };
 
 interface ReplyEmailInput {
@@ -47,25 +48,33 @@ interface ReplyEmailInput {
   replyBody: string;
 }
 
-// Sends the admin's reply directly to the lead's inbox, from your own
-// configured address — no mailto:/external mail client involved.
 export const sendReplyEmail = async (input: ReplyEmailInput): Promise<void> => {
   const { toName, toEmail, originalSubject, replyBody } = input;
 
-  if (!transporter) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
     throw new Error(
-      "SMTP is not configured on the server (SMTP_HOST/SMTP_USER/SMTP_PASS), so in-app replies can't be sent yet."
+      "Resend is not configured on the server (RESEND_API_KEY / EMAIL_FROM missing)."
     );
   }
 
   const subjectLine = originalSubject ? `Re: ${originalSubject}` : "Re: your message";
 
-  await transporter.sendMail({
-    from: `"${env.CONTACT_RECEIVER_EMAIL ? "Negaso Kena" : env.SMTP_USER}" <${env.SMTP_USER}>`,
-    to: `"${toName}" <${toEmail}>`,
-    replyTo: env.CONTACT_RECEIVER_EMAIL || env.SMTP_USER,
+  const { error } = await resend.emails.send({
+    from: env.EMAIL_FROM,
+    to: toEmail,
     subject: subjectLine,
-    text: replyBody,
-    html: `<p>${replyBody.replace(/\n/g, "<br/>")}</p>`,
+    html: `
+      <div style="font-family: sans-serif; line-height: 1.6;">
+        <p>Hi ${toName},</p>
+        <p>${replyBody.replace(/\n/g, "<br/>")}</p>
+        <br />
+        <p>— Negaso Kena</p>
+      </div>
+    `,
   });
+
+  if (error) {
+    console.error("Reply email failed:", error);
+    throw new Error(error.message || "Failed to send reply");
+  }
 };
