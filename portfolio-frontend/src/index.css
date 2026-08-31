@@ -69,9 +69,84 @@
     color: transparent;
   }
 
+  /* --- Theme toggle bulb --- */
+  .theme-bulb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-navy-600);
+    background: var(--color-navy-800);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .theme-bulb:hover {
+    border-color: var(--color-sea-400);
+  }
+
+  .theme-bulb .bulb-rays path {
+    stroke: var(--color-paper-faint);
+    stroke-width: 2;
+    stroke-linecap: round;
+    fill: none;
+    transition: stroke 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+  }
+  .theme-bulb .bulb-glass {
+    fill: none;
+    stroke: var(--color-paper-dim);
+    stroke-width: 2;
+    transition: stroke 0.2s ease, fill 0.2s ease;
+  }
+  .theme-bulb .bulb-base {
+    stroke: var(--color-paper-dim);
+    stroke-width: 2;
+    stroke-linecap: round;
+    fill: none;
+  }
+  .theme-bulb .bulb-filament {
+    stroke: var(--color-paper-faint);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  /* Lit (light mode active) state — bulb glows magenta/sea */
+  .theme-bulb-lit .bulb-glass {
+    stroke: var(--color-magenta-400);
+    fill: color-mix(in srgb, var(--color-magenta-400) 18%, transparent);
+  }
+  .theme-bulb-lit .bulb-filament {
+    stroke: var(--color-magenta-400);
+  }
+  .theme-bulb-lit .bulb-rays path {
+    stroke: var(--color-sea-400);
+    opacity: 1;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .animate-signal {
       animation: signal-draw 2.4s ease-in-out infinite;
+    }
+    .animate-patrol {
+      animation: patrol-loop 9s ease-in-out infinite;
+    }
+    .animate-glow-a {
+      animation: glow-pulse 6s ease-in-out infinite;
+    }
+    .animate-glow-b {
+      animation: glow-pulse 7.5s ease-in-out infinite 1.2s;
+    }
+    .animate-glow-c {
+      animation: glow-pulse 5.2s ease-in-out infinite 0.6s;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-patrol {
+      animation: none;
     }
   }
 
@@ -79,5 +154,19 @@
     0% { stroke-dashoffset: 1200; }
     60% { stroke-dashoffset: 0; }
     100% { stroke-dashoffset: -1200; }
+  }
+
+  /* Patrol path: start -> up -> side -> down -> back to start, looping */
+  @keyframes patrol-loop {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(0, -140px); }
+    50%  { transform: translate(220px, -140px); }
+    75%  { transform: translate(220px, 0); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.15); }
   }
 }

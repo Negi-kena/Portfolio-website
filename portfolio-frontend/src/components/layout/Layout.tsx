@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { NightWatchScene } from "./NightWatchScene";
 import { useFetch } from "../../hooks/useFetch";
 import { getSettings } from "../../api/endpoints";
 
@@ -10,6 +11,7 @@ export function Layout() {
   return (
     <div className="blueprint-grid flex min-h-screen flex-col">
       <Navbar />
+      <NightWatchScene avatarUrl={settings?.avatarUrl} />
       <main className="flex-1">
         <Outlet context={{ settings }} />
       </main>
