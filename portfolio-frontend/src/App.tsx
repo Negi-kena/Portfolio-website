@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { Layout } from "./components/layout/Layout";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { Loading } from "./components/ui/Loading";
@@ -32,49 +33,51 @@ const AdminSettings = lazy(() => import("./pages/admin/AdminSettings").then((m) 
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* --- Public site --- */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:slug" element={<ProjectDetail />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogDetail />} />
-            <Route path="/contact" element={<Contact />} />
-          </Route>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            {/* --- Public site --- */}
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:slug" element={<ProjectDetail />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogDetail />} />
+              <Route path="/contact" element={<Contact />} />
+            </Route>
 
-          {/* --- Admin (lazy-loaded) --- */}
-          <Route
-            path="/admin/login"
-            element={
-              <Suspense fallback={<Loading label="Loading" />}>
-                <AdminLogin />
-              </Suspense>
-            }
-          />
-          <Route element={<ProtectedRoute />}>
+            {/* --- Admin (lazy-loaded) --- */}
             <Route
-              path="/admin"
+              path="/admin/login"
               element={
                 <Suspense fallback={<Loading label="Loading" />}>
-                  <AdminLayout />
+                  <AdminLogin />
                 </Suspense>
               }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="projects" element={<AdminProjects />} />
-              <Route path="projects/:id" element={<AdminProjectEditor />} />
-              <Route path="blog" element={<AdminBlog />} />
-              <Route path="blog/:id" element={<AdminBlogEditor />} />
-              <Route path="messages" element={<AdminMessages />} />
-              <Route path="settings" element={<AdminSettings />} />
+            />
+            <Route element={<ProtectedRoute />}>
+              <Route
+                path="/admin"
+                element={
+                  <Suspense fallback={<Loading label="Loading" />}>
+                    <AdminLayout />
+                  </Suspense>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="projects" element={<AdminProjects />} />
+                <Route path="projects/:id" element={<AdminProjectEditor />} />
+                <Route path="blog" element={<AdminBlog />} />
+                <Route path="blog/:id" element={<AdminBlogEditor />} />
+                <Route path="messages" element={<AdminMessages />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AuthProvider>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
