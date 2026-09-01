@@ -7,8 +7,8 @@ import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
 
 const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Invalid email format").max(254),
-  password: z.string().min(1, "Password is required").max(200),
+  email: z.string().email(),
+  password: z.string().min(1),
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {

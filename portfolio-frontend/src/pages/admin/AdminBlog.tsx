@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, CircleCheck, CircleDashed } from "lucide-react";
 import { useFetch } from "../../hooks/useFetch";
@@ -6,27 +5,18 @@ import { getAllPosts, deletePost } from "../../api/endpoints";
 import { Loading } from "../../components/ui/Loading";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { Button } from "../../components/ui/Button";
-import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
-import { SEO } from "../../components/shared/SEO";
 
 export function AdminBlog() {
   const { data: posts, loading, refetch } = useFetch(getAllPosts, []);
-  const [pendingDelete, setPendingDelete] = useState<{ id: number; title: string } | null>(null);
 
-  const confirmDelete = async () => {
-    if (!pendingDelete) return;
-    try {
-      await deletePost(pendingDelete.id);
-      setPendingDelete(null);
-      refetch();
-    } catch {
-      alert("Failed to delete post.");
-    }
+  const handleDelete = async (id: number, title: string) => {
+    if (!confirm(`Delete "${title}"? This can't be undone.`)) return;
+    await deletePost(id);
+    refetch();
   };
 
   return (
     <div>
-      <SEO title="Manage Blog — Admin Console" />
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-paper">Blog posts</h1>
@@ -59,9 +49,9 @@ export function AdminBlog() {
             <div key={p.id} className="flex items-center justify-between gap-4 p-4">
               <div className="flex min-w-0 items-center gap-3">
                 {p.published ? (
-                  <CircleCheck size={15} className="shrink-0 text-sea-400" aria-label="Published" />
+                  <CircleCheck size={15} className="shrink-0 text-sea-400" />
                 ) : (
-                  <CircleDashed size={15} className="shrink-0 text-paper-faint" aria-label="Draft" />
+                  <CircleDashed size={15} className="shrink-0 text-paper-faint" />
                 )}
                 <div className="min-w-0">
                   <p className="truncate font-medium text-paper">{p.title}</p>
@@ -69,34 +59,19 @@ export function AdminBlog() {
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">
-                <Link to={`/admin/blog/${p.id}`} aria-label={`Edit ${p.title}`} title="Edit post">
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <Pencil size={14} aria-hidden="true" />
+                <Link to={`/admin/blog/${p.id}`}>
+                  <Button variant="ghost">
+                    <Pencil size={14} />
                   </Button>
                 </Link>
-                <Button
-                  variant="danger"
-                  className="h-8 w-8 p-0"
-                  aria-label={`Delete ${p.title}`}
-                  title="Delete post"
-                  onClick={() => setPendingDelete({ id: p.id, title: p.title })}
-                >
-                  <Trash2 size={14} aria-hidden="true" />
+                <Button variant="danger" onClick={() => handleDelete(p.id, p.title)}>
+                  <Trash2 size={14} />
                 </Button>
               </div>
             </div>
           ))}
         </div>
       )}
-
-      <ConfirmDialog
-        open={pendingDelete !== null}
-        title={`Delete "${pendingDelete?.title}"?`}
-        description="This action cannot be undone and will permanently remove this post."
-        confirmLabel="Delete post"
-        onConfirm={confirmDelete}
-        onCancel={() => setPendingDelete(null)}
-      />
     </div>
   );
 }

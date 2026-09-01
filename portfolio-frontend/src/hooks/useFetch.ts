@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import { getErrorMessage } from "../api/client";
 
 interface FetchState<T> {
   data: T | null;
@@ -23,7 +22,7 @@ export function useFetch<T>(fn: () => Promise<T>, deps: unknown[] = []): FetchSt
         if (!cancelled) setData(res);
       })
       .catch((err) => {
-        if (!cancelled) setError(getErrorMessage(err));
+        if (!cancelled) setError(err?.response?.data?.message || err.message || "Something went wrong");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

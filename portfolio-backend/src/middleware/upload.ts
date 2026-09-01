@@ -3,28 +3,19 @@ import path from "path";
 import fs from "fs";
 import { env } from "../config/env";
 
-const uploadDir = path.join(process.cwd(), "uploads");
+export const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, "-");
-    cb(null, `${base}-${Date.now()}${ext}`);
-  },
-});
+// Buffer the upload in memory instead of writing it straight to disk —
+// the controller runs it through sharp first (resize + re-encode to
+// WebP) so what actually lands on disk is already optimized, rather
+// than storing whatever format/resolution the visitor's browser or
+// phone camera produced.
+const storage = multer.memoryStorage();
 
-const allowedMimeTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-  "image/gif",
-  "application/pdf",
-];
+const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
 
 export const upload = multer({
   storage,
@@ -33,7 +24,7 @@ export const upload = multer({
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Unsupported file type. Allowed: JPG, PNG, WEBP, AVIF, GIF, PDF."));
+      cb(new Error("Unsupported file type. Allowed: JPG, PNG, WEBP, GIF, PDF."));
     }
   },
 });

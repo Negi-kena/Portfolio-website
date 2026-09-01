@@ -1,12 +1,9 @@
-import { useEffect, useState, type SubmitEvent, type ChangeEvent, type ReactNode } from "react";
+import { useEffect, useState, type SubmitEvent, type ChangeEvent, type ReactNode, } from "react";
 import { Save, CheckCircle2 } from "lucide-react";
 import { getSettings, updateSettings } from "../../api/endpoints";
 import { Button } from "../../components/ui/Button";
 import { ImageUploadField } from "../../components/shared/ImageUploadField";
 import { Loading } from "../../components/ui/Loading";
-import { SEO } from "../../components/shared/SEO";
-import { useToast } from "../../context/ToastContext";
-import { getErrorMessage } from "../../api/client";
 import type { SiteSettings } from "../../types";
 
 const inputClass =
@@ -30,7 +27,6 @@ function Field({
 }
 
 export function AdminSettings() {
-  const toast = useToast();
   const [form, setForm] = useState<Partial<SiteSettings>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,13 +39,11 @@ export function AdminSettings() {
         setForm(settings || {});
         setLoading(false);
       })
-      .catch((err) => {
-        const msg = getErrorMessage(err, "Failed to load settings.");
-        setError(msg);
-        toast.error(msg);
+      .catch(() => {
+        setError("Failed to load settings.");
         setLoading(false);
       });
-  }, [toast]);
+  }, []);
 
   const set =
     (field: keyof SiteSettings) =>
@@ -71,15 +65,15 @@ export function AdminSettings() {
       await updateSettings(form);
 
       setSaved(true);
-      toast.success("Settings updated successfully!");
 
       setTimeout(() => {
         setSaved(false);
       }, 2500);
     } catch (err: any) {
-      const msg = getErrorMessage(err, "Failed to save settings.");
-      setError(msg);
-      toast.error(msg);
+      setError(
+        err?.response?.data?.message ||
+          "Failed to save settings.",
+      );
     } finally {
       setSaving(false);
     }
@@ -91,7 +85,6 @@ export function AdminSettings() {
 
   return (
     <div className="space-y-7">
-      <SEO title="Site Settings — Admin Console" />
       {/* Header */}
       <div>
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-sea-400">

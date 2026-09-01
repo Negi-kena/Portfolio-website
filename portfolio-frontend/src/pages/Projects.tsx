@@ -31,10 +31,7 @@ export function Projects() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <SEO
-        title="Projects"
-        description="A showcase of full-stack web applications, software architecture, open-source projects, and experiments built by Negaso Kena."
-      />
+      <SEO title="Projects" description="A collection of things I've built, from full-stack apps to smaller experiments." />
       <h1 className="font-display text-3xl font-bold text-paper">
         All <span className="text-gradient-signal">projects</span>
       </h1>

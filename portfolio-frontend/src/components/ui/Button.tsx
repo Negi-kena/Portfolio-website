@@ -1,22 +1,28 @@
 import type {
   ButtonHTMLAttributes,
   ReactNode,
+  Ref,
 } from "react";
 
 interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "ghost" | "danger";
   children: ReactNode;
+  // React 19 passes `ref` through to function components as a normal prop —
+  // no forwardRef() wrapper needed. Declared explicitly so callers (e.g.
+  // ConfirmDialog, to move focus into the dialog on open) can attach one.
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export function Button({
   variant = "primary",
   className = "",
   children,
+  ref,
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea-400";
+    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50";
 
   const variants: Record<string, string> = {
     primary:
@@ -31,6 +37,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       className={`${base} ${variants[variant]} ${className}`}
       {...props}
     >

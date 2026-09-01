@@ -5,28 +5,17 @@ import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import { slugify } from "../utils/slugify";
 
-const sanitizeString = (val: unknown) =>
-  typeof val === "string" ? val.replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, "").trim() : val;
-
-const safeUrlSchema = z.preprocess(
-  (v) => (v === "" || v === null ? undefined : sanitizeString(v)),
-  z.string().url("Must be a valid URL (http/https)").optional(),
-);
-
 const projectSchema = z.object({
-  title: z.preprocess(sanitizeString, z.string().min(1, "Title is required").max(300)),
-  summary: z.preprocess(sanitizeString, z.string().min(1, "Summary is required").max(1000)),
-  description: z.preprocess(sanitizeString, z.string().min(1, "Description is required")),
-  imageUrl: z.preprocess(sanitizeString, z.string().max(500).optional()),
-  liveUrl: safeUrlSchema,
-  repoUrl: safeUrlSchema,
+  title: z.string().min(1),
+  summary: z.string().min(1),
+  description: z.string().min(1),
+  imageUrl: z.string().optional(),
+  liveUrl: z.string().url().optional().or(z.literal("")),
+  repoUrl: z.string().url().optional().or(z.literal("")),
   featured: z.boolean().optional(),
-  order: z.number().int().optional(),
-  tags: z.array(z.preprocess(sanitizeString, z.string().min(1).max(50))).optional(),
+  order: z.number().optional(),
+  tags: z.array(z.string().min(1)).optional(),
 });
-
-const slugParamSchema = z.string().min(1).max(200);
-const idParamSchema = z.coerce.number().int().positive("Invalid project ID");
 
 const projectInclude = { tags: { include: { tag: true } } } as const;
 
@@ -62,9 +51,8 @@ export const listProjects = asyncHandler(async (req: Request, res: Response) => 
 
 // GET /api/projects/:slug (public)
 export const getProjectBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const slug = slugParamSchema.parse(req.params.slug);
   const project = await prisma.project.findUnique({
-    where: { slug },
+    where: { slug: req.params.slug },
     include: projectInclude,
   });
   if (!project) throw ApiError.notFound("Project not found");
@@ -97,7 +85,8 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
 
 // PUT /api/projects/:id (admin)
 export const updateProject = asyncHandler(async (req: Request, res: Response) => {
-  const id = idParamSchema.parse(req.params.id);
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid project id");
 
   const data = projectSchema.partial().parse(req.body);
 
@@ -128,7 +117,8 @@ export const updateProject = asyncHandler(async (req: Request, res: Response) =>
 
 // DELETE /api/projects/:id (admin)
 export const deleteProject = asyncHandler(async (req: Request, res: Response) => {
-  const id = idParamSchema.parse(req.params.id);
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid project id");
   await prisma.project.delete({ where: { id } });
   res.json({ success: true, message: "Project deleted" });
 });

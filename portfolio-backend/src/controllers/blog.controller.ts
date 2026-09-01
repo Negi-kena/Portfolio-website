@@ -5,20 +5,14 @@ import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import { slugify } from "../utils/slugify";
 
-const sanitizeString = (val: unknown) =>
-  typeof val === "string" ? val.replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, "").trim() : val;
-
 const postSchema = z.object({
-  title: z.preprocess(sanitizeString, z.string().min(1, "Title is required").max(300)),
-  excerpt: z.preprocess(sanitizeString, z.string().min(1, "Excerpt is required").max(1000)),
-  content: z.preprocess(sanitizeString, z.string().min(1, "Content is required")),
-  coverImage: z.preprocess(sanitizeString, z.string().max(500).optional()),
+  title: z.string().min(1),
+  excerpt: z.string().min(1),
+  content: z.string().min(1),
+  coverImage: z.string().optional(),
   published: z.boolean().optional(),
-  tags: z.array(z.preprocess(sanitizeString, z.string().min(1).max(50))).optional(),
+  tags: z.array(z.string().min(1)).optional(),
 });
-
-const slugParamSchema = z.string().min(1).max(200);
-const idParamSchema = z.coerce.number().int().positive("Invalid post ID");
 
 const postInclude = { tags: { include: { tag: true } } } as const;
 
@@ -51,9 +45,8 @@ export const listPublishedPosts = asyncHandler(async (_req: Request, res: Respon
 
 // GET /api/blog/:slug (public)
 export const getPostBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const slug = slugParamSchema.parse(req.params.slug);
   const post = await prisma.blogPost.findFirst({
-    where: { slug, published: true },
+    where: { slug: req.params.slug, published: true },
     include: postInclude,
   });
   if (!post) throw ApiError.notFound("Post not found");
@@ -94,7 +87,8 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
 
 // PUT /api/admin/blog/:id (admin)
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
-  const id = idParamSchema.parse(req.params.id);
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid post id");
 
   const data = postSchema.partial().parse(req.body);
   const existing = await prisma.blogPost.findUnique({ where: { id } });
@@ -129,7 +123,8 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
 
 // DELETE /api/admin/blog/:id (admin)
 export const deletePost = asyncHandler(async (req: Request, res: Response) => {
-  const id = idParamSchema.parse(req.params.id);
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) throw ApiError.badRequest("Invalid post id");
   await prisma.blogPost.delete({ where: { id } });
   res.json({ success: true, message: "Post deleted" });
 });

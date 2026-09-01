@@ -7,36 +7,38 @@ import { BlogCard } from "../components/shared/BlogCard";
 import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Button } from "../components/ui/Button";
-import { SEO } from "../components/shared/SEO";
 import { resolveAssetUrl } from "../api/client";
+import { SEO } from "../components/shared/SEO";
 import type { SiteSettings } from "../types";
 
 export function Home() {
-  const { settings } =
-    useOutletContext<{ settings: SiteSettings | null }>();
+  const { settings } = useOutletContext<{ settings: SiteSettings | null }>();
 
-  const {
-    data: projects,
-    loading: projectsLoading,
-  } = useFetch(() => getProjects(true), []);
+  const { data: projects, loading: projectsLoading } = useFetch(
+    () => getProjects(true),
+    [],
+  );
 
-  const {
-    data: posts,
-    loading: postsLoading,
-  } = useFetch(getPublishedPosts, []);
+  const { data: posts, loading: postsLoading } = useFetch(
+    getPublishedPosts,
+    [],
+  );
 
   return (
     <div>
       <SEO
-        title={settings?.heroTitle ? `${settings.heroTitle} — Full-Stack Developer` : "Negaso Kena — Full-Stack Developer"}
-        description={settings?.heroSubtitle || "A Passionate Full-Stack Developer portfolio showcasing modern web apps, APIs, and writing."}
-        image={settings?.avatarUrl}
+        description={
+          settings?.heroSubtitle ||
+          "A Passionate Full-Stack Developer, AI automation, n8n, Zapier, and Hubspot Automation Specialist."
+        }
       />
       {/* --- Hero --- */}
-      <section className="relative overflow-hidden border-b border-navy-700 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-4xl">
+      <section className="hero-shell relative overflow-hidden border-b border-navy-700 px-6 py-24 md:py-32">
+        <div className="hero-signal-frame" aria-hidden="true" />
+        <div className="hero-signal-frame-glow" aria-hidden="true" />
+        <div className="hero-section-marker" aria-hidden="true" />
+        <div className="mx-auto max-w-5xl">
           <div className="flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-center md:gap-12">
-
             {/* Avatar with rotating gradient ring */}
             <div className="relative isolate flex-shrink-0 w-[264px] h-[264px]">
               {/* Glow behind ring */}
@@ -48,14 +50,21 @@ export function Home() {
               {/* Photo container */}
               <div
                 className="absolute inset-[3px] z-10 flex items-center justify-center overflow-hidden rounded-full"
-                style={{ background: "linear-gradient(145deg, #0e0e2e 0%, #191945 100%)" }}
+                style={{
+                  background:
+                    "linear-gradient(145deg, #0e0e2e 0%, #191945 100%)",
+                }}
               >
                 {/* Pulls profile image dynamically from admin settings if available */}
                 <img
-                  src={settings?.avatarUrl ? resolveAssetUrl(settings.avatarUrl) : "/your-photo.jpg"}
-                  alt="Negaso Kena — Full-Stack Developer"
-                  loading="eager"
+                  src={
+                    settings?.avatarUrl
+                      ? resolveAssetUrl(settings.avatarUrl)
+                      : "/your-photo.jpg"
+                  }
+                  alt="Negaso Kena"
                   decoding="async"
+                  // Hero avatar is above the fold and usually the page's LCP element — load it eagerly.
                   fetchPriority="high"
                   className="h-full w-full object-cover object-top"
                 />
@@ -73,8 +82,7 @@ export function Home() {
               </h1>
 
               <p className="mt-4 max-w-xl text-lg text-paper-dim">
-                {settings?.heroSubtitle ||
-                  "A Passionate Full-Stack Developer"}
+                {settings?.heroSubtitle || "A Passionate Full-Stack Developer"}
               </p>
 
               {/* Signature waveform */}
@@ -91,14 +99,8 @@ export function Home() {
                     x2="1"
                     y2="0"
                   >
-                    <stop
-                      offset="0%"
-                      stopColor="#a63fea"
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="#2dd4bf"
-                    />
+                    <stop offset="0%" stopColor="#a63fea" />
+                    <stop offset="100%" stopColor="#2dd4bf" />
                   </linearGradient>
                 </defs>
 
@@ -117,26 +119,27 @@ export function Home() {
               {/* CTA buttons */}
               <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
                 <Link to="/projects">
-                  <Button>
+                  <Button className="brand-cta">
                     View projects
                     <ArrowRight size={15} />
                   </Button>
                 </Link>
 
                 {settings?.resumeUrl && (
-                    <a
-                      href={resolveAssetUrl(settings.resumeUrl)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-opacity hover:opacity-90"
-                      style={{
-                        background: "linear-gradient(90deg, #06b6d4 0%, #d946ef 100%)",
-                      }}
-                    >
-                      <Download size={15} />
-                      Download Resume
-                    </a>
-                  )}
+                  <a
+                    href={resolveAssetUrl(settings.resumeUrl)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="brand-cta inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-all"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #06b6d4 0%, #d946ef 100%)",
+                    }}
+                  >
+                    <Download size={15} />
+                    Download Resume
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -145,34 +148,33 @@ export function Home() {
 
       {/* --- Bio --- */}
       {settings?.bio && (
-        <section className="mx-auto max-w-3xl px-6 py-20">
-          <div className="mb-8">
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-sea-400">
-              About me
-            </p>
+        <section className="mx-auto max-w-4xl px-6 py-20">
+          <div className="about-card">
+            <div className="about-card-content">
+              <div className="mb-8">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-sea-400">
+                  About me
+                </p>
 
-            <h2 className="mt-3 font-display text-3xl font-semibold text-paper md:text-4xl">
-              The developer{" "}
-              <span className="text-gradient-signal">behind the code.</span>
-            </h2>
-          </div>
+                <h2 className="mt-3 font-display text-3xl font-semibold text-paper md:text-4xl">
+                  The developer{" "}
+                  <span className="text-gradient-signal">behind the code.</span>
+                </h2>
+              </div>
 
-          <div className="border-l border-navy-600 pl-6 md:pl-8">
-            <p className="whitespace-pre-wrap text-left text-base leading-8 text-paper-dim md:text-lg">
-              {settings.bio}
-            </p>
+              <p className="whitespace-pre-wrap text-left text-base leading-8 text-paper-dim md:text-lg">
+                {settings.bio}
+              </p>
+            </div>
           </div>
         </section>
       )}
 
       {/* --- Featured projects --- */}
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <h2 className="font-display text-2xl font-semibold text-paper">
-            Featured{" "}
-            <span className="text-gradient-signal">
-              projects
-            </span>
+            Featured <span className="text-gradient-signal">projects</span>
           </h2>
 
           <Link
@@ -194,23 +196,19 @@ export function Home() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {projects.slice(0, 3).map((p) => (
-              <ProjectCard
-                key={p.id}
-                project={p}
-              />
+              <ProjectCard key={p.id} project={p} />
             ))}
           </div>
         )}
       </section>
 
+      <div className="site-separator" aria-hidden="true" />
+
       {/* --- Recent posts --- */}
-      <section className="mx-auto max-w-5xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <h2 className="font-display text-2xl font-semibold text-paper">
-            Recent{" "}
-            <span className="text-gradient-signal">
-              writing
-            </span>
+            Recent <span className="text-gradient-signal">writing</span>
           </h2>
 
           <Link
@@ -232,10 +230,7 @@ export function Home() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {posts.slice(0, 3).map((p) => (
-              <BlogCard
-                key={p.id}
-                post={p}
-              />
+              <BlogCard key={p.id} post={p} />
             ))}
           </div>
         )}

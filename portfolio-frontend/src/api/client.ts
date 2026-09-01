@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toastBus } from "../lib/toastBus";
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
@@ -27,54 +28,35 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-export const getErrorMessage = (error: unknown, fallback = "An unexpected error occurred."): string => {
-  if (axios.isAxiosError(error)) {
-    if (error.response?.data?.message) {
-      return String(error.response.data.message);
-    }
-    if (error.response?.status === 400) {
-      return "Invalid request. Please check your input.";
-    }
-    if (error.response?.status === 401) {
-      return "Session expired or unauthorized. Please sign in again.";
-    }
-    if (error.response?.status === 403) {
-      return "You do not have permission to perform this action.";
-    }
-    if (error.response?.status === 404) {
-      return "The requested resource was not found.";
-    }
-    if (error.response?.status === 429) {
-      return "Too many requests. Please slow down and try again later.";
-    }
-    if (error.response?.status && error.response.status >= 500) {
-      return "The server encountered an error. Please try again later.";
-    }
-    if (error.code === "ECONNABORTED" || error.message.toLowerCase().includes("timeout")) {
-      return "The request timed out. Please verify your connection.";
-    }
-    if (error.code === "ERR_NETWORK" || !error.response) {
-      return "Network connection issue. Please check your internet connection.";
-    }
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return fallback;
-};
-
+// Global error interceptor.
+// Component-level code (e.g. useFetch, form submit handlers) still owns
+// rendering error state inline — this only standardizes the *unexpected*
+// failure classes (dead network, timeouts, server errors, expired
+// sessions) with a consistent toast, so no call site has to remember to.
 apiClient.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("portfolio_admin_token");
-    }
+    const hadToken = Boolean(localStorage.getItem("portfolio_admin_token"));
+    const status = error?.response?.status as number | undefined;
 
-    // Attach standardized user message to error object for easy consumption
-    if (error && typeof error === "object") {
-      error.userFriendlyMessage = getErrorMessage(error);
+    if (!error.response) {
+      // Request never reached the server: DNS failure, offline, CORS, etc.
+      toastBus.error(
+        error.code === "ECONNABORTED"
+          ? "Request timed out. Please try again."
+          : "Can't reach the server. Check your connection and try again.",
+      );
+    } else if (status === 401) {
+      localStorage.removeItem("portfolio_admin_token");
+      if (hadToken) {
+        toastBus.error("Your session has expired. Please log in again.");
+      }
+    } else if (status === 429) {
+      toastBus.error(
+        (error.response?.data?.message as string) || "Too many requests. Please slow down and try again.",
+      );
+    } else if (status && status >= 500) {
+      toastBus.error("Something went wrong on our end. Please try again shortly.");
     }
 
     return Promise.reject(error);

@@ -15,10 +15,10 @@ export function BlogCard({ post }: { post: BlogPost }) {
           {post.coverImage ? (
             <img
               src={resolveAssetUrl(post.coverImage)}
-              alt={`Cover image for article: ${post.title}`}
+              alt={post.title}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center font-mono text-xs text-paper-faint">
@@ -29,9 +29,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <time dateTime={post.publishedAt || undefined} className="font-mono text-xs text-sea-400">
-          {formatDate(post.publishedAt)}
-        </time>
+        <span className="font-mono text-xs text-sea-400">{formatDate(post.publishedAt)}</span>
         <Link to={`/blog/${post.slug}`}>
           <h3 className="font-display text-lg font-semibold text-paper transition-colors hover:text-sea-400">
             {post.title}
@@ -40,7 +38,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
         <p className="flex-1 text-sm text-paper-dim">{post.excerpt}</p>
 
         {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5" role="list" aria-label="Article topics">
+          <div className="flex flex-wrap gap-1.5">
             {post.tags.map((t) => (
               <Tag key={t.id} label={t.name} />
             ))}

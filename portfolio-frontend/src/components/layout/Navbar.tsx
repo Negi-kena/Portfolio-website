@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu, X, Terminal } from "lucide-react";
 import { ThemeBulb } from "../ui/ThemeBulb";
 
@@ -13,47 +13,36 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        setOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open]);
-
   return (
     <header className="sticky top-0 z-50 overflow-hidden">
       {/* Animated brand gradient layer */}
-      <div className="pointer-events-none absolute inset-0 header-gradient" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 header-gradient">
         <div className="aurora-blob aurora-blob-cyan" />
         <div className="aurora-blob aurora-blob-magenta" />
         <div className="aurora-blob aurora-blob-indigo" />
         <div className="scan-sweep" />
       </div>
 
-      <nav className="relative mx-auto flex max-w-5xl items-center justify-between px-6 py-4" aria-label="Main Navigation">
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5 lg:px-8">
         {/* Brand */}
         <NavLink
           to="/"
-          aria-label="Negaso Kena — Portfolio Home"
-          className="flex items-center gap-2 font-display text-lg font-semibold text-paper rounded-md focus-visible:outline-2 focus-visible:outline-sea-400"
+          className="flex items-center gap-2 font-body text-xl font-semibold text-paper"
         >
-          <Terminal size={18} className="text-magenta-500" aria-hidden="true" />
+          <Terminal size={18} className="text-magenta-500" />
           Negaso<span className="text-sea-400">.dev</span>
         </NavLink>
 
         {/* Desktop nav — glass pill that sits on the gradient */}
-        <div className="hidden items-center gap-3 md:flex">
-          <ul className="nav-glass flex items-center gap-1 rounded-full px-1.5 py-1.5 font-mono text-sm">
+        <div className="hidden items-center gap-4 md:flex md:translate-x-3">
+          <ul className="nav-glass flex items-center gap-1 rounded-full px-2 py-2 font-mono text-base">
             {links.map((link) => (
               <li key={link.to}>
                 <NavLink
                   to={link.to}
                   end={link.to === "/"}
                   className={({ isActive }) =>
-                    `rounded-full px-4 py-1.5 transition-all focus-visible:outline-2 focus-visible:outline-sea-400 ${
+                    `rounded-full px-5 py-2 transition-all ${
                       isActive
                         ? "nav-link-active text-white"
                         : "nav-link-inactive text-paper-dim hover:text-paper"
@@ -73,14 +62,17 @@ export function Navbar() {
         <div className="flex items-center gap-3 md:hidden">
           <ThemeBulb />
           <button
-            type="button"
-            className="rounded-md p-1.5 text-paper focus-visible:outline-2 focus-visible:outline-sea-400"
+            className="text-paper"
             onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-controls="mobile-nav-list"
             aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-nav-menu"
           >
-            {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+            {open ? (
+              <X size={22} aria-hidden="true" />
+            ) : (
+              <Menu size={22} aria-hidden="true" />
+            )}
           </button>
         </div>
       </nav>
@@ -88,9 +80,8 @@ export function Navbar() {
       {/* Mobile menu */}
       {open && (
         <ul
-          id="mobile-nav-list"
-          aria-label="Mobile menu"
-          className="relative flex flex-col gap-1 border-t border-white/10 px-6 py-4 font-mono text-sm md:hidden"
+          id="mobile-nav-menu"
+          className="relative flex flex-col gap-1 border-t border-white/10 px-6 py-4 font-mono text-base md:hidden"
         >
           {links.map((link) => (
             <li key={link.to}>
@@ -99,7 +90,7 @@ export function Navbar() {
                 end={link.to === "/"}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2 focus-visible:outline-2 focus-visible:outline-sea-400 ${
+                  `block rounded-lg px-3 py-2 ${
                     isActive ? "bg-white/10 text-sea-400" : "text-paper-dim"
                   }`
                 }

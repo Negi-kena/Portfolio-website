@@ -7,7 +7,7 @@ export function ImageUploadField({
   value,
   onChange,
   label = "image",
-  accept = "image/jpeg,image/png,image/webp,image/avif,image/gif",
+  accept = "image/jpeg,image/png,image/webp,image/gif",
 }: {
   value?: string;
   onChange: (url: string) => void;
@@ -46,15 +46,14 @@ export function ImageUploadField({
               <FileText size={20} /> Open resume PDF
             </a>
           ) : (
-            <img src={resolveAssetUrl(value)} alt="Uploaded asset preview" className="h-32 rounded-md border border-navy-600 object-cover" />
+            <img src={resolveAssetUrl(value)} alt="" className="h-32 rounded-md border border-navy-600 object-cover" />
           )}
           <button
             type="button"
             onClick={() => onChange("")}
-            aria-label={`Remove uploaded ${label}`}
-            className="absolute -right-2 -top-2 rounded-full bg-navy-950 p-1 text-paper-dim hover:text-red-400 focus-visible:outline-2 focus-visible:outline-sea-400"
+            className="absolute -right-2 -top-2 rounded-full bg-navy-950 p-1 text-paper-dim hover:text-red-400"
           >
-            <X size={14} aria-hidden="true" />
+            <X size={14} />
           </button>
         </div>
       ) : (

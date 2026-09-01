@@ -31,10 +31,7 @@ export function Blog() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
-      <SEO
-        title="Blog"
-        description="Articles, tutorials, and notes on full-stack web development, TypeScript, Node.js, databases, and software architecture by Negaso Kena."
-      />
+      <SEO title="Blog" description="Notes on what I'm building, learning, and breaking." />
       <h1 className="font-display text-3xl font-bold text-paper">
         The <span className="text-gradient-signal">blog</span>
       </h1>

@@ -16,7 +16,6 @@ import {
   getMessages,
 } from "../../api/endpoints";
 import { Loading } from "../../components/ui/Loading";
-import { SEO } from "../../components/shared/SEO";
 
 export function AdminDashboard() {
   const {
@@ -83,7 +82,6 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <SEO title="Overview — Admin Console" />
       {/* Header */}
       <section>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

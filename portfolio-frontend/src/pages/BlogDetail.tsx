@@ -8,8 +8,8 @@ import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Tag } from "../components/ui/Tag";
 import { Button } from "../components/ui/Button";
-import { SEO } from "../components/shared/SEO";
 import { resolveAssetUrl } from "../api/client";
+import { SEO } from "../components/shared/SEO";
 
 const formatDate = (iso?: string | null) =>
   iso ? new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "";
@@ -22,7 +22,6 @@ export function BlogDetail() {
   if (error || !post) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16">
-        <SEO title="Post Not Found" description="The requested blog post could not be found." />
         <EmptyState
           title="Post not found"
           description="It may have been unpublished or the link is incorrect."
@@ -43,10 +42,7 @@ export function BlogDetail() {
       <SEO
         title={post.title}
         description={post.excerpt}
-        image={post.coverImage}
-        type="article"
-        publishedTime={post.publishedAt}
-        tags={post.tags.map((t) => t.name)}
+        image={post.coverImage ? resolveAssetUrl(post.coverImage) : undefined}
       />
       <Link to="/blog" className="mb-8 inline-flex items-center gap-1 font-mono text-sm text-sea-400 hover:text-sea-300">
         <ArrowLeft size={14} /> all posts
@@ -56,9 +52,10 @@ export function BlogDetail() {
         <div className="mb-8 aspect-[16/9] overflow-hidden rounded-lg border border-navy-700 bg-navy-800">
           <img
             src={resolveAssetUrl(post.coverImage)}
-            alt={`Cover banner for article: ${post.title}`}
-            loading="lazy"
+            alt={post.title}
             decoding="async"
+            // Above the fold and typically the LCP element on this page — load eagerly, don't lazy-load it.
+            fetchPriority="high"
             className="h-full w-full object-cover"
           />
         </div>

@@ -8,8 +8,8 @@ import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Tag } from "../components/ui/Tag";
 import { Button } from "../components/ui/Button";
-import { SEO } from "../components/shared/SEO";
 import { resolveAssetUrl } from "../api/client";
+import { SEO } from "../components/shared/SEO";
 
 export function ProjectDetail() {
   const { slug = "" } = useParams();
@@ -19,7 +19,6 @@ export function ProjectDetail() {
   if (error || !project) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16">
-        <SEO title="Project Not Found" description="The requested project could not be found." />
         <EmptyState
           title="Project not found"
           description="It may have been removed or the link is incorrect."
@@ -40,8 +39,7 @@ export function ProjectDetail() {
       <SEO
         title={project.title}
         description={project.summary}
-        image={project.imageUrl}
-        tags={project.tags.map((t) => t.name)}
+        image={project.imageUrl ? resolveAssetUrl(project.imageUrl) : undefined}
       />
       <Link to="/projects" className="mb-8 inline-flex items-center gap-1 font-mono text-sm text-sea-400 hover:text-sea-300">
         <ArrowLeft size={14} /> all projects
@@ -51,9 +49,10 @@ export function ProjectDetail() {
         <div className="mb-8 aspect-video overflow-hidden rounded-lg border border-navy-700 bg-navy-800">
           <img
             src={resolveAssetUrl(project.imageUrl)}
-            alt={`Screenshot and preview of ${project.title}`}
-            loading="lazy"
+            alt={project.title}
             decoding="async"
+            // Above the fold and typically the LCP element on this page — load eagerly, don't lazy-load it.
+            fetchPriority="high"
             className="h-full w-full object-cover"
           />
         </div>
