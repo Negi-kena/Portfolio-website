@@ -31,19 +31,27 @@ export function Home() {
         <div className="mx-auto max-w-4xl">
           <div className="flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-center md:gap-12">
 
-            {/* Profile image */}
-            {settings?.avatarUrl && (
-              <div className="shrink-0">
+            {/* Avatar with rotating gradient ring */}
+            <div className="relative isolate flex-shrink-0 w-[264px] h-[264px]">
+              {/* Glow behind ring */}
+              <div className="avatar-ring-glow absolute inset-0 -z-20 rounded-full" />
+
+              {/* Rotating gradient ring */}
+              <div className="avatar-ring absolute inset-0 -z-10 rounded-full" />
+
+              {/* Photo container */}
+              <div
+                className="absolute inset-[3px] z-10 flex items-center justify-center overflow-hidden rounded-full"
+                style={{ background: "linear-gradient(145deg, #0e0e2e 0%, #191945 100%)" }}
+              >
+                {/* Pulls profile image dynamically from admin settings if available */}
                 <img
-                  src={resolveAssetUrl(settings.avatarUrl)}
-                  alt="Profile"
-                  className="h-50 w-50 rounded-full border-7 border-cyan-400 object-cover object-[center_20%] shadow-lg md:h-67 md:w-65"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
+                  src={settings?.avatarUrl ? resolveAssetUrl(settings.avatarUrl) : "/your-photo.jpg"}
+                  alt="Negaso Kena"
+                  className="h-full w-full object-cover object-top"
                 />
               </div>
-            )}
+            </div>
 
             {/* Hero content */}
             <div className="max-w-2xl text-center md:text-left">
@@ -107,26 +115,27 @@ export function Home() {
                 </Link>
 
                 {settings?.resumeUrl && (
-                  <a
-                    href={resolveAssetUrl(settings.resumeUrl)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Button variant="ghost">
+                    <a
+                      href={resolveAssetUrl(settings.resumeUrl)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-opacity hover:opacity-90"
+                      style={{
+                        background: "linear-gradient(90deg, #06b6d4 0%, #d946ef 100%)",
+                      }}
+                    >
                       <Download size={15} />
-                      Resume
-                    </Button>
-                  </a>
-                )}
+                      Download Resume
+                    </a>
+                  )}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-         {/* --- Bio --- */}
-
-            {settings?.bio && (
+      {/* --- Bio --- */}
+      {settings?.bio && (
         <section className="mx-auto max-w-3xl px-6 py-20">
           <div className="mb-8">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-sea-400">
@@ -146,8 +155,6 @@ export function Home() {
           </div>
         </section>
       )}
-
-      
 
       {/* --- Featured projects --- */}
       <section className="mx-auto max-w-5xl px-6 py-16">
