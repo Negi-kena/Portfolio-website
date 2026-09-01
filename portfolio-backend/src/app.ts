@@ -12,18 +12,37 @@ import { apiLimiter } from "./middleware/rateLimiter";
 
 const app = express();
 
+app.disable("x-powered-by");
+
 // --- Reverse proxy ---
 // Render sits behind a reverse proxy and forwards the client's IP
 // through X-Forwarded-For. Trust the first proxy so Express can
 // correctly determine req.ip for express-rate-limit.
 app.set("trust proxy", 1);
 
-// --- Security & parsing ---
+// --- Security headers & parsing ---
 app.use(
   helmet({
     crossOriginResourcePolicy: {
       policy: "cross-origin",
     },
+    crossOriginOpenerPolicy: {
+      policy: "same-origin-allow-popups",
+    },
+    referrerPolicy: {
+      policy: "strict-origin-when-cross-origin",
+    },
+    frameguard: {
+      action: "deny",
+    },
+    hsts:
+      env.NODE_ENV === "production"
+        ? {
+            maxAge: 31536000,
+            includeSubDomains: true,
+            preload: true,
+          }
+        : false,
   }),
 );
 

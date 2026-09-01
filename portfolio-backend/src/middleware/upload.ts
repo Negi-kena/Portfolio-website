@@ -17,7 +17,14 @@ const storage = multer.diskStorage({
   },
 });
 
-const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"];
+const allowedMimeTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "application/pdf",
+];
 
 export const upload = multer({
   storage,
@@ -26,7 +33,7 @@ export const upload = multer({
     if (allowedMimeTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Unsupported file type. Allowed: JPG, PNG, WEBP, GIF, PDF."));
+      cb(new Error("Unsupported file type. Allowed: JPG, PNG, WEBP, AVIF, GIF, PDF."));
     }
   },
 });

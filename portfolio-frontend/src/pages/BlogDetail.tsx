@@ -8,6 +8,7 @@ import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Tag } from "../components/ui/Tag";
 import { Button } from "../components/ui/Button";
+import { SEO } from "../components/shared/SEO";
 import { resolveAssetUrl } from "../api/client";
 
 const formatDate = (iso?: string | null) =>
@@ -21,6 +22,7 @@ export function BlogDetail() {
   if (error || !post) {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16">
+        <SEO title="Post Not Found" description="The requested blog post could not be found." />
         <EmptyState
           title="Post not found"
           description="It may have been unpublished or the link is incorrect."
@@ -38,13 +40,27 @@ export function BlogDetail() {
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-16">
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        image={post.coverImage}
+        type="article"
+        publishedTime={post.publishedAt}
+        tags={post.tags.map((t) => t.name)}
+      />
       <Link to="/blog" className="mb-8 inline-flex items-center gap-1 font-mono text-sm text-sea-400 hover:text-sea-300">
         <ArrowLeft size={14} /> all posts
       </Link>
 
       {post.coverImage && (
         <div className="mb-8 aspect-[16/9] overflow-hidden rounded-lg border border-navy-700 bg-navy-800">
-          <img src={resolveAssetUrl(post.coverImage)} alt={post.title} className="h-full w-full object-cover" />
+          <img
+            src={resolveAssetUrl(post.coverImage)}
+            alt={`Cover banner for article: ${post.title}`}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
         </div>
       )}
 

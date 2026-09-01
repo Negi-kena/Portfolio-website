@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { ErrorBoundary } from "../shared/ErrorBoundary";
 
 const links = [
   {
@@ -52,8 +53,27 @@ export function AdminLayout() {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  // Close mobile navigation on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileOpen) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
+
   return (
     <div className="min-h-screen bg-navy-950 text-paper">
+      {/* Skip to content for keyboard navigation */}
+      <a
+        href="#admin-main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-magenta-500 focus:px-4 focus:py-2 focus:text-navy-950 focus:font-semibold focus:shadow-lg focus:outline-2 focus:outline-sea-400"
+      >
+        Skip to main content
+      </a>
+
       {/* Mobile header */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-navy-700 bg-navy-950/90 px-5 py-4 backdrop-blur md:hidden">
         <Link
@@ -67,8 +87,10 @@ export function AdminLayout() {
         <button
           type="button"
           onClick={() => setMobileOpen((value) => !value)}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-admin-navigation"
           aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-          className="rounded-md border border-navy-700 p-2 text-paper-dim transition hover:border-sea-400 hover:text-sea-400"
+          className="rounded-md border border-navy-700 p-2 text-paper-dim transition hover:border-sea-400 hover:text-sea-400 focus-visible:outline-2 focus-visible:outline-sea-400"
         >
           {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -93,7 +115,7 @@ export function AdminLayout() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-5">
+          <nav className="flex-1 px-3 py-5" aria-label="Admin Navigation">
             <p className="mb-3 px-3 font-mono text-[10px] uppercase tracking-[0.2em] text-paper-faint">
               workspace
             </p>
@@ -128,7 +150,7 @@ export function AdminLayout() {
                               : "border-navy-700 bg-navy-800/40 text-paper-faint group-hover:border-navy-600 group-hover:text-sea-400"
                           }`}
                         >
-                          <Icon size={15} />
+                          <Icon size={15} aria-hidden="true" />
                         </span>
 
                         <span className="min-w-0">
@@ -165,18 +187,22 @@ export function AdminLayout() {
               <Link
                 to="/"
                 target="_blank"
-                className="flex flex-1 items-center justify-center gap-2 rounded-md border border-navy-700 px-3 py-2 text-xs text-paper-dim transition hover:border-sea-400 hover:text-sea-400"
+                rel="noreferrer"
+                aria-label="View live public site (opens in a new tab)"
+                className="flex flex-1 items-center justify-center gap-2 rounded-md border border-navy-700 px-3 py-2 text-xs text-paper-dim transition hover:border-sea-400 hover:text-sea-400 focus-visible:outline-2 focus-visible:outline-sea-400"
               >
-                <ExternalLink size={13} />
+                <ExternalLink size={13} aria-hidden="true" />
                 View site
               </Link>
 
               <button
+                type="button"
                 onClick={logout}
                 title="Log out"
-                className="flex items-center justify-center rounded-md border border-navy-700 px-3 py-2 text-paper-faint transition hover:border-red-500/50 hover:text-red-400"
+                aria-label="Log out of admin console"
+                className="flex items-center justify-center rounded-md border border-navy-700 px-3 py-2 text-paper-faint transition hover:border-red-500/50 hover:text-red-400 focus-visible:outline-2 focus-visible:outline-sea-400"
               >
-                <LogOut size={14} />
+                <LogOut size={14} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -184,8 +210,11 @@ export function AdminLayout() {
 
         {/* Mobile navigation */}
         {mobileOpen && (
-          <div className="fixed inset-x-0 top-[65px] z-30 border-b border-navy-700 bg-navy-950 p-4 shadow-2xl md:hidden">
-            <nav className="space-y-1">
+          <div
+            id="mobile-admin-navigation"
+            className="fixed inset-x-0 top-[65px] z-30 border-b border-navy-700 bg-navy-950 p-4 shadow-2xl md:hidden"
+          >
+            <nav className="space-y-1" aria-label="Mobile Admin Navigation">
               {links.map(
                 ({
                   to,
@@ -207,7 +236,7 @@ export function AdminLayout() {
                       }`
                     }
                   >
-                    <Icon size={16} />
+                    <Icon size={16} aria-hidden="true" />
                     <span>
                       <span className="block text-sm">
                         {label}
@@ -226,15 +255,16 @@ export function AdminLayout() {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-paper-dim"
                 >
-                  <ExternalLink size={14} />
+                  <ExternalLink size={14} aria-hidden="true" />
                   View public site
                 </Link>
 
                 <button
+                  type="button"
                   onClick={logout}
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-paper-dim"
                 >
-                  <LogOut size={14} />
+                  <LogOut size={14} aria-hidden="true" />
                   Log out
                 </button>
               </div>
@@ -244,8 +274,10 @@ export function AdminLayout() {
 
         {/* Main content */}
         <div className="min-w-0 flex-1">
-          <main className="mx-auto max-w-6xl px-5 py-7 sm:px-7 md:px-10 md:py-10">
-            <Outlet />
+          <main id="admin-main-content" tabIndex={-1} className="mx-auto max-w-6xl px-5 py-7 sm:px-7 md:px-10 md:py-10 focus:outline-none">
+            <ErrorBoundary fallbackTitle="Admin Section Error" fallbackDescription="An unexpected error occurred in this admin panel.">
+              <Outlet />
+            </ErrorBoundary>
           </main>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { ProjectCard } from "../components/shared/ProjectCard";
 import { SearchFilterBar } from "../components/shared/SearchFilterBar";
 import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
+import { SEO } from "../components/shared/SEO";
 
 export function Projects() {
   const { data: projects, loading } = useFetch(() => getProjects(), []);
@@ -30,6 +31,10 @@ export function Projects() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
+      <SEO
+        title="Projects"
+        description="A showcase of full-stack web applications, software architecture, open-source projects, and experiments built by Negaso Kena."
+      />
       <h1 className="font-display text-3xl font-bold text-paper">
         All <span className="text-gradient-signal">projects</span>
       </h1>

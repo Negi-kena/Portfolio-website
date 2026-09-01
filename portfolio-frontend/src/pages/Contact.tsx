@@ -2,8 +2,12 @@ import { useState, type FormEvent } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
 import { submitContact } from "../api/endpoints";
 import { Button } from "../components/ui/Button";
+import { SEO } from "../components/shared/SEO";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage } from "../api/client";
 
 export function Contact() {
+  const toast = useToast();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -18,16 +22,20 @@ export function Contact() {
     try {
       await submitContact(form);
       setStatus("sent");
+      toast.success("Thank you! Your message has been sent successfully.");
       setForm({ name: "", email: "", subject: "", message: "" });
     } catch (err: any) {
+      const msg = getErrorMessage(err, "Failed to send message. Please try again.");
       setStatus("error");
-      setErrorMsg(err?.response?.data?.message || "Something went wrong. Please try again.");
+      setErrorMsg(msg);
+      toast.error(msg);
     }
   };
 
   if (status === "sent") {
     return (
       <section className="mx-auto flex max-w-lg flex-col items-center gap-4 px-6 py-24 text-center">
+        <SEO title="Message Sent" description="Thank you for getting in touch with Negaso Kena." />
         <CheckCircle2 size={40} className="text-sea-400" />
         <h1 className="font-display text-2xl font-bold text-paper">Message sent</h1>
         <p className="text-paper-dim">Thanks for reaching out — I'll get back to you soon.</p>
@@ -40,6 +48,10 @@ export function Contact() {
 
   return (
     <section className="mx-auto max-w-lg px-6 py-16">
+      <SEO
+        title="Contact"
+        description="Get in touch with Negaso Kena for project inquiries, freelance work, software engineering collaborations, or questions."
+      />
       <h1 className="font-display text-3xl font-bold text-paper">
         Get in <span className="text-gradient-signal">touch</span>
       </h1>

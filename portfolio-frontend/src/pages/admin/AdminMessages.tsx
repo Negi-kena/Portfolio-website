@@ -6,12 +6,16 @@ import { Loading } from "../../components/ui/Loading";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { Button } from "../../components/ui/Button";
 import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { SEO } from "../../components/shared/SEO";
+import { useToast } from "../../context/ToastContext";
+import { getErrorMessage } from "../../api/client";
 import type { Message } from "../../types";
 
 const formatDate = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 
 export function AdminMessages() {
   const { data: messages, loading, refetch } = useFetch(getMessages, []);
+  const toast = useToast();
   const [expanded, setExpanded] = useState<number | null>(null);
   const [replyDrafts, setReplyDrafts] = useState<Record<number, string>>({});
   const [sendingReplyId, setSendingReplyId] = useState<number | null>(null);
@@ -34,10 +38,13 @@ export function AdminMessages() {
     setReplyError(null);
     try {
       await replyToMessage(id, body);
+      toast.success("Reply sent successfully!");
       setReplyDrafts((d) => ({ ...d, [id]: "" }));
       refetch();
     } catch (err: any) {
-      setReplyError(err?.response?.data?.message || "Failed to send reply.");
+      const msg = getErrorMessage(err, "Failed to send reply.");
+      setReplyError(msg);
+      toast.error(msg);
     } finally {
       setSendingReplyId(null);
     }
@@ -45,13 +52,19 @@ export function AdminMessages() {
 
   const handleDelete = async () => {
     if (pendingDeleteId === null) return;
-    await deleteMessage(pendingDeleteId);
-    setPendingDeleteId(null);
-    refetch();
+    try {
+      await deleteMessage(pendingDeleteId);
+      toast.success("Message deleted.");
+      setPendingDeleteId(null);
+      refetch();
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to delete message."));
+    }
   };
 
   return (
     <div>
+      <SEO title="Messages Inbox — Admin Console" />
       <h1 className="font-display text-2xl font-bold text-paper">Messages</h1>
       <p className="mt-1 mb-8 text-paper-dim">Submissions from your contact form. Replies are sent directly from here.</p>
 

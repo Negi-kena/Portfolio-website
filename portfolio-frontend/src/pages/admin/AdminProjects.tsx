@@ -14,6 +14,10 @@ import {
 import { Loading } from "../../components/ui/Loading";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { Button } from "../../components/ui/Button";
+import { resolveAssetUrl } from "../../api/client";
+import { useState } from "react";
+import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { SEO } from "../../components/shared/SEO";
 
 export function AdminProjects() {
   const {
@@ -22,20 +26,13 @@ export function AdminProjects() {
     refetch,
   } = useFetch(() => getProjects(), []);
 
-  const handleDelete = async (
-    id: number,
-    title: string,
-  ) => {
-    if (
-      !confirm(
-        `Delete "${title}"?\n\nThis cannot be undone.`,
-      )
-    ) {
-      return;
-    }
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; title: string } | null>(null);
 
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
     try {
-      await deleteProject(id);
+      await deleteProject(pendingDelete.id);
+      setPendingDelete(null);
       refetch();
     } catch {
       alert("Failed to delete project.");
@@ -48,6 +45,7 @@ export function AdminProjects() {
 
   return (
     <div className="space-y-7">
+      <SEO title="Manage Projects — Admin Console" />
       {/* Header */}
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -134,8 +132,10 @@ export function AdminProjects() {
                   <div className="hidden h-14 w-20 shrink-0 overflow-hidden rounded-md border border-navy-700 bg-navy-800 sm:block">
                     {project.imageUrl ? (
                       <img
-                        src={project.imageUrl}
-                        alt=""
+                        src={resolveAssetUrl(project.imageUrl)}
+                        alt={`Preview for ${project.title}`}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover"
                       />
                     ) : (
@@ -197,28 +197,30 @@ export function AdminProjects() {
                 <div className="flex items-center justify-start gap-1 md:justify-end">
                   <Link
                     to={`/admin/projects/${project.id}`}
+                    aria-label={`Edit ${project.title}`}
                     title="Edit project"
                   >
                     <Button
                       variant="ghost"
                       className="h-8 w-8 p-0"
                     >
-                      <Pencil size={13} />
+                      <Pencil size={13} aria-hidden="true" />
                     </Button>
                   </Link>
 
                   <Button
                     variant="danger"
                     className="h-8 w-8 p-0"
+                    aria-label={`Delete ${project.title}`}
                     title="Delete project"
                     onClick={() =>
-                      handleDelete(
-                        project.id,
-                        project.title,
-                      )
+                      setPendingDelete({
+                        id: project.id,
+                        title: project.title,
+                      })
                     }
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={13} aria-hidden="true" />
                   </Button>
                 </div>
 
@@ -235,6 +237,15 @@ export function AdminProjects() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={`Delete "${pendingDelete?.title}"?`}
+        description="This action cannot be undone and will permanently remove this project."
+        confirmLabel="Delete project"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

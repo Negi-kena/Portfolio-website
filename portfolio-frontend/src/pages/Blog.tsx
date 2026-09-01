@@ -5,6 +5,7 @@ import { BlogCard } from "../components/shared/BlogCard";
 import { SearchFilterBar } from "../components/shared/SearchFilterBar";
 import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
+import { SEO } from "../components/shared/SEO";
 
 export function Blog() {
   const { data: posts, loading } = useFetch(getPublishedPosts, []);
@@ -30,6 +31,10 @@ export function Blog() {
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-16">
+      <SEO
+        title="Blog"
+        description="Articles, tutorials, and notes on full-stack web development, TypeScript, Node.js, databases, and software architecture by Negaso Kena."
+      />
       <h1 className="font-display text-3xl font-bold text-paper">
         The <span className="text-gradient-signal">blog</span>
       </h1>

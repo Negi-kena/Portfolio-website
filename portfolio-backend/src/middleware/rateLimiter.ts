@@ -25,3 +25,12 @@ export const contactLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Limiter for file uploads — prevents disk exhaustion
+export const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30,
+  message: { success: false, message: "Too many upload requests. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

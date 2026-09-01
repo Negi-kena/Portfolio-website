@@ -13,8 +13,14 @@ import { asyncHandler } from "../utils/asyncHandler";
  *
  * for optional settings fields.
  */
-const emptyToUndefined = (value: unknown) =>
-  value === null || value === undefined || value === "" ? undefined : value;
+const emptyToUndefined = (value: unknown) => {
+  if (value === null || value === undefined || value === "") return undefined;
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F]/g, "").trim();
+    return cleaned === "" ? undefined : cleaned;
+  }
+  return value;
+};
 
 /**
  * Optional plain string.

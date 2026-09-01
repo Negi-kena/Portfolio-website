@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Terminal } from "lucide-react";
 import { ThemeBulb } from "../ui/ThemeBulb";
 
@@ -13,23 +13,34 @@ const links = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   return (
     <header className="sticky top-0 z-50 overflow-hidden">
       {/* Animated brand gradient layer */}
-      <div className="pointer-events-none absolute inset-0 header-gradient">
+      <div className="pointer-events-none absolute inset-0 header-gradient" aria-hidden="true">
         <div className="aurora-blob aurora-blob-cyan" />
         <div className="aurora-blob aurora-blob-magenta" />
         <div className="aurora-blob aurora-blob-indigo" />
         <div className="scan-sweep" />
       </div>
 
-      <nav className="relative mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <nav className="relative mx-auto flex max-w-5xl items-center justify-between px-6 py-4" aria-label="Main Navigation">
         {/* Brand */}
         <NavLink
           to="/"
-          className="flex items-center gap-2 font-display text-lg font-semibold text-paper"
+          aria-label="Negaso Kena — Portfolio Home"
+          className="flex items-center gap-2 font-display text-lg font-semibold text-paper rounded-md focus-visible:outline-2 focus-visible:outline-sea-400"
         >
-          <Terminal size={18} className="text-magenta-500" />
+          <Terminal size={18} className="text-magenta-500" aria-hidden="true" />
           Negaso<span className="text-sea-400">.dev</span>
         </NavLink>
 
@@ -42,7 +53,7 @@ export function Navbar() {
                   to={link.to}
                   end={link.to === "/"}
                   className={({ isActive }) =>
-                    `rounded-full px-4 py-1.5 transition-all ${
+                    `rounded-full px-4 py-1.5 transition-all focus-visible:outline-2 focus-visible:outline-sea-400 ${
                       isActive
                         ? "nav-link-active text-white"
                         : "nav-link-inactive text-paper-dim hover:text-paper"
@@ -62,18 +73,25 @@ export function Navbar() {
         <div className="flex items-center gap-3 md:hidden">
           <ThemeBulb />
           <button
-            className="text-paper"
+            type="button"
+            className="rounded-md p-1.5 text-paper focus-visible:outline-2 focus-visible:outline-sea-400"
             onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-controls="mobile-nav-list"
             aria-label={open ? "Close menu" : "Open menu"}
           >
-            {open ? <X size={22} /> : <Menu size={22} />}
+            {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
       {open && (
-        <ul className="relative flex flex-col gap-1 border-t border-white/10 px-6 py-4 font-mono text-sm md:hidden">
+        <ul
+          id="mobile-nav-list"
+          aria-label="Mobile menu"
+          className="relative flex flex-col gap-1 border-t border-white/10 px-6 py-4 font-mono text-sm md:hidden"
+        >
           {links.map((link) => (
             <li key={link.to}>
               <NavLink
@@ -81,7 +99,7 @@ export function Navbar() {
                 end={link.to === "/"}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `block rounded-lg px-3 py-2 ${
+                  `block rounded-lg px-3 py-2 focus-visible:outline-2 focus-visible:outline-sea-400 ${
                     isActive ? "bg-white/10 text-sea-400" : "text-paper-dim"
                   }`
                 }

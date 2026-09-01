@@ -7,6 +7,7 @@ import { BlogCard } from "../components/shared/BlogCard";
 import { Loading } from "../components/ui/Loading";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Button } from "../components/ui/Button";
+import { SEO } from "../components/shared/SEO";
 import { resolveAssetUrl } from "../api/client";
 import type { SiteSettings } from "../types";
 
@@ -26,6 +27,11 @@ export function Home() {
 
   return (
     <div>
+      <SEO
+        title={settings?.heroTitle ? `${settings.heroTitle} — Full-Stack Developer` : "Negaso Kena — Full-Stack Developer"}
+        description={settings?.heroSubtitle || "A Passionate Full-Stack Developer portfolio showcasing modern web apps, APIs, and writing."}
+        image={settings?.avatarUrl}
+      />
       {/* --- Hero --- */}
       <section className="relative overflow-hidden border-b border-navy-700 px-6 py-24 md:py-32">
         <div className="mx-auto max-w-4xl">
@@ -47,7 +53,10 @@ export function Home() {
                 {/* Pulls profile image dynamically from admin settings if available */}
                 <img
                   src={settings?.avatarUrl ? resolveAssetUrl(settings.avatarUrl) : "/your-photo.jpg"}
-                  alt="Negaso Kena"
+                  alt="Negaso Kena — Full-Stack Developer"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="h-full w-full object-cover object-top"
                 />
               </div>

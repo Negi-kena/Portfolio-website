@@ -29,7 +29,13 @@ export function NightWatchScene({ avatarUrl }: NightWatchSceneProps) {
         <div className="animate-patrol">
           <div className="h-40 w-40 overflow-hidden rounded-full border-4 border-sea-400/70 shadow-[0_0_50px_10px_rgba(45,212,191,0.35)]">
             {avatarUrl ? (
-              <img src={resolveAssetUrl(avatarUrl)} alt="" className="h-full w-full object-cover object-top" />
+              <img
+                src={resolveAssetUrl(avatarUrl)}
+                alt="Negaso Kena on night patrol"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover object-top"
+              />
             ) : (
               <div className="h-full w-full bg-navy-800" />
             )}

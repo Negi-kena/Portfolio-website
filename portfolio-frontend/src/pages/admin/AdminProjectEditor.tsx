@@ -6,6 +6,9 @@ import { getProjects, createProject, updateProject, type ProjectInput } from "..
 import { Button } from "../../components/ui/Button";
 import { ImageUploadField } from "../../components/shared/ImageUploadField";
 import { Loading } from "../../components/ui/Loading";
+import { SEO } from "../../components/shared/SEO";
+import { useToast } from "../../context/ToastContext";
+import { getErrorMessage } from "../../api/client";
 
 const emptyForm: ProjectInput = {
   title: "",
@@ -23,6 +26,7 @@ export function AdminProjectEditor() {
   const { id } = useParams();
   const isNew = id === "new";
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [form, setForm] = useState<ProjectInput>(emptyForm);
   const [tagsInput, setTagsInput] = useState("");
@@ -54,10 +58,12 @@ export function AdminProjectEditor() {
         setTagsInput(item.tags.map((t) => t.name).join(", "));
       })
       .catch((err) => {
-        setError(err?.response?.data?.message || "Failed to load content.");
+        const msg = getErrorMessage(err, "Failed to load project.");
+        setError(msg);
+        toast.error(msg);
       })
       .finally(() => setLoading(false));
-  }, [id, isNew]);
+  }, [id, isNew, toast]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -67,12 +73,16 @@ export function AdminProjectEditor() {
     try {
       if (isNew) {
         await createProject({ ...form, tags });
+        toast.success("Project created successfully!");
       } else {
         await updateProject(Number(id), { ...form, tags });
+        toast.success("Project updated successfully!");
       }
       navigate("/admin/projects");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to save project.");
+      const msg = getErrorMessage(err, "Failed to save project.");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -82,6 +92,7 @@ export function AdminProjectEditor() {
 
   return (
     <div>
+      <SEO title={isNew ? "New Project — Admin Console" : `Edit Project: ${form.title || ""} — Admin Console`} />
       <Link to="/admin/projects" className="mb-6 inline-flex items-center gap-1 font-mono text-sm text-sea-400 hover:text-sea-300">
         <ArrowLeft size={14} /> back to projects
       </Link>

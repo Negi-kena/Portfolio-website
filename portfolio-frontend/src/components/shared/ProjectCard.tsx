@@ -13,7 +13,9 @@ export function ProjectCard({ project }: { project: Project }) {
           {project.imageUrl ? (
             <img
               src={resolveAssetUrl(project.imageUrl)}
-              alt={project.title}
+              alt={`Preview screenshot of ${project.title}`}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
@@ -33,7 +35,7 @@ export function ProjectCard({ project }: { project: Project }) {
         <p className="flex-1 text-sm text-paper-dim">{project.summary}</p>
 
         {project.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5" role="list" aria-label="Technologies used">
             {project.tags.map((t) => (
               <Tag key={t.id} label={t.name} />
             ))}
@@ -42,13 +44,25 @@ export function ProjectCard({ project }: { project: Project }) {
 
         <div className="flex gap-4 pt-1 font-mono text-xs">
           {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-magenta-400 hover:text-magenta-300">
-              <ExternalLink size={13} /> live
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Visit live site for ${project.title} (opens in a new tab)`}
+              className="flex items-center gap-1 text-magenta-400 hover:text-magenta-300 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea-400"
+            >
+              <ExternalLink size={13} aria-hidden="true" /> live
             </a>
           )}
           {project.repoUrl && (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-paper-dim hover:text-paper">
-              <Code2 size={13} /> source
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`View source code for ${project.title} on GitHub (opens in a new tab)`}
+              className="flex items-center gap-1 text-paper-dim hover:text-paper focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea-400"
+            >
+              <Code2 size={13} aria-hidden="true" /> source
             </a>
           )}
         </div>

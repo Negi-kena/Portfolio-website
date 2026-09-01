@@ -13,7 +13,13 @@ export function BlogCard({ post }: { post: BlogPost }) {
       <Link to={`/blog/${post.slug}`} className="block">
         <div className="aspect-[16/9] overflow-hidden bg-navy-700">
           {post.coverImage ? (
-            <img src={resolveAssetUrl(post.coverImage)} alt={post.title} className="h-full w-full object-cover" />
+            <img
+              src={resolveAssetUrl(post.coverImage)}
+              alt={`Cover image for article: ${post.title}`}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
           ) : (
             <div className="flex h-full items-center justify-center font-mono text-xs text-paper-faint">
               no cover
@@ -23,7 +29,9 @@ export function BlogCard({ post }: { post: BlogPost }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <span className="font-mono text-xs text-sea-400">{formatDate(post.publishedAt)}</span>
+        <time dateTime={post.publishedAt || undefined} className="font-mono text-xs text-sea-400">
+          {formatDate(post.publishedAt)}
+        </time>
         <Link to={`/blog/${post.slug}`}>
           <h3 className="font-display text-lg font-semibold text-paper transition-colors hover:text-sea-400">
             {post.title}
@@ -32,7 +40,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
         <p className="flex-1 text-sm text-paper-dim">{post.excerpt}</p>
 
         {post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5" role="list" aria-label="Article topics">
             {post.tags.map((t) => (
               <Tag key={t.id} label={t.name} />
             ))}

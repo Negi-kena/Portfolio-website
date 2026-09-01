@@ -5,6 +5,9 @@ import { getAllPosts, createPost, updatePost, type PostInput } from "../../api/e
 import { Button } from "../../components/ui/Button";
 import { ImageUploadField } from "../../components/shared/ImageUploadField";
 import { Loading } from "../../components/ui/Loading";
+import { SEO } from "../../components/shared/SEO";
+import { useToast } from "../../context/ToastContext";
+import { getErrorMessage } from "../../api/client";
 
 const emptyForm: PostInput = { title: "", excerpt: "", content: "", coverImage: "", published: false, tags: [] };
 
@@ -12,6 +15,7 @@ export function AdminBlogEditor() {
   const { id } = useParams();
   const isNew = id === "new";
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [form, setForm] = useState<PostInput>(emptyForm);
   const [tagsInput, setTagsInput] = useState("");
@@ -40,10 +44,12 @@ export function AdminBlogEditor() {
         setTagsInput(item.tags.map((t) => t.name).join(", "));
       })
       .catch((err) => {
-        setError(err?.response?.data?.message || "Failed to load content.");
+        const msg = getErrorMessage(err, "Failed to load post.");
+        setError(msg);
+        toast.error(msg);
       })
       .finally(() => setLoading(false));
-  }, [id, isNew]);
+  }, [id, isNew, toast]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -53,12 +59,16 @@ export function AdminBlogEditor() {
     try {
       if (isNew) {
         await createPost({ ...form, tags });
+        toast.success("Post created successfully!");
       } else {
         await updatePost(Number(id), { ...form, tags });
+        toast.success("Post updated successfully!");
       }
       navigate("/admin/blog");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to save post.");
+      const msg = getErrorMessage(err, "Failed to save post.");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -68,6 +78,7 @@ export function AdminBlogEditor() {
 
   return (
     <div>
+      <SEO title={isNew ? "New Post — Admin Console" : `Edit Post: ${form.title || ""} — Admin Console`} />
       <Link to="/admin/blog" className="mb-6 inline-flex items-center gap-1 font-mono text-sm text-sea-400 hover:text-sea-300">
         <ArrowLeft size={14} /> back to posts
       </Link>
