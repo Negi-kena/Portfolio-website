@@ -3,7 +3,11 @@ import { z } from "zod";
 import { prisma } from "../config/prisma";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import { sendContactNotification, sendReplyEmail } from "../services/email.service";
+import {
+  sendContactNotification,
+  sendReplyEmail,
+  sendAutoReply,
+} from "../services/email.service";
 
 const contactSchema = z.object({
   name: z.string().min(1).max(120),
@@ -16,20 +20,25 @@ const contactSchema = z.object({
 export const submitContactForm = asyncHandler(async (req: Request, res: Response) => {
   const data = contactSchema.parse(req.body);
 
-  // The message is the source of truth — it's saved first, and the response
-  // reflects that outcome. Email notification is a best-effort side effect:
-  // if it fails (bad SMTP creds, provider hiccup, etc.) that must NEVER turn
-  // a successful submission into a false "Internal Server Error" for the
-  // person who just contacted you.
+  // Save the message first — this is the source of truth
   const saved = await prisma.message.create({ data });
 
+  // Best-effort emails (notification to you + auto-reply to visitor)
+  // If email fails, the form submission still succeeds
   try {
-    await sendContactNotification(data);
+    await Promise.all([
+      sendContactNotification(data), // → you
+      sendAutoReply(data),           // → visitor (automatic)
+    ]);
   } catch (err) {
-    console.error("Contact notification email failed to send (message was still saved):", err);
+    console.error("Email sending failed (message was still saved):", err);
   }
 
-  res.status(201).json({ success: true, message: "Message sent", data: { id: saved.id } });
+  res.status(201).json({
+    success: true,
+    message: "Message sent",
+    data: { id: saved.id },
+  });
 });
 
 // GET /api/admin/messages  (admin)
@@ -56,8 +65,7 @@ const replySchema = z.object({
   body: z.string().min(1).max(5000),
 });
 
-// POST /api/admin/messages/:id/reply  (admin) — sends the reply directly
-// from the server via SMTP, marks the message as replied.
+// POST /api/admin/messages/:id/reply  (admin)
 export const replyToMessage = asyncHandler(async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const { body } = replySchema.parse(req.body);
